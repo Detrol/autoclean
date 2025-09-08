@@ -193,7 +193,9 @@
                             <div class="w-8 h-8 rounded-lg gradient-purple shadow-lg shadow-purple-500/25 flex items-center justify-center">
                                 <x-heroicon-o-building-storefront class="w-4 h-4 text-white" />
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ $station->name }}</h3>
+                            <a href="{{ route('station.details', $station->id) }}" wire:navigate class="text-xl font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                {{ $station->name }}
+                            </a>
                         </div>
                         
                         @if(!auth()->user()->hasActiveTimeLog($station->id))
@@ -222,11 +224,16 @@
                     @php $stationTasks = $tasksByStation->get($station->id, collect()) @endphp
                     
                     @if($stationTasks->count() > 0)
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-5 h-5 rounded gradient-orange shadow-lg shadow-orange-500/25 flex items-center justify-center">
-                                <x-heroicon-o-clipboard-document-list class="w-3 h-3 text-white" style="width: 12px; height: 12px;" />
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded gradient-orange shadow-lg shadow-orange-500/25 flex items-center justify-center">
+                                    <x-heroicon-o-clipboard-document-list class="w-3 h-3 text-white" style="width: 12px; height: 12px;" />
+                                </div>
+                                <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Dagens uppgifter ({{ $stationTasks->count() }})</h4>
                             </div>
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Dagens uppgifter ({{ $stationTasks->count() }})</h4>
+                            <a href="{{ route('station.details', $station->id) }}" wire:navigate class="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 transition-colors">
+                                Visa alla uppgifter →
+                            </a>
                         </div>
                         <div class="space-y-3">
                             @foreach($stationTasks as $taskSchedule)
