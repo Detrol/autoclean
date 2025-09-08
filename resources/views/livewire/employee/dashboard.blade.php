@@ -27,7 +27,8 @@
         </div>
     @endif
 
-    {{-- Enhanced Statistics --}}
+    {{-- Enhanced Statistics - Endast för admin --}}
+    @can('admin')
     <div class="grid gap-6 md:grid-cols-4 mb-8">
         <div class="card-modern p-6">
             <div class="flex items-center">
@@ -85,10 +86,11 @@
             </div>
         </div>
     </div>
+    @endcan
 
     {{-- Enhanced Active Time Logs --}}
     @if($activeTimeLogs->count() > 0)
-        <div class="mb-8 card-modern p-6 border-l-4 border-primary-500">
+        <div class="mb-8 card-modern-elevated p-6 border-l-4 border-primary-500">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center gradient-primary shadow-lg shadow-blue-500/25">
                     <x-heroicon-o-clock class="w-5 h-5 text-white" />
@@ -100,7 +102,7 @@
             </div>
             <div class="space-y-4">
                 @foreach($activeTimeLogs as $timeLog)
-                    <div class="card-modern p-4 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 border-primary-200 dark:border-primary-700">
+                    <div class="card-modern-elevated p-4 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 border-primary-200 dark:border-primary-700">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -114,9 +116,6 @@
                             <div class="flex items-center gap-4">
                                 <div class="text-right">
                                     <div class="text-lg font-mono font-bold text-primary-700 dark:text-primary-300">
-                                        {{ $timeLog->clock_in->diffForHumans() }}
-                                    </div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400">
                                         <span data-timer="{{ $timeLog->clock_in->timestamp }}" class="live-timer">
                                             {{ gmdate('H:i:s', $timeLog->clock_in->diffInSeconds(now())) }}
                                         </span>
@@ -127,7 +126,7 @@
                                     variant="danger"
                                     wire:click="clockOut({{ $timeLog->id }})"
                                     wire:confirm="Är du säker på att du vill klocka ut?"
-                                    class="btn-primary-modern"
+                                    class="gradient-danger text-white cursor-pointer"
                                 >
                                     Klocka ut
                                 </flux:button>
@@ -139,15 +138,60 @@
         </div>
     @endif
 
+    {{-- Dagens avslutade arbetspass --}}
+    @if($completedTimeLogs->count() > 0)
+        <div class="mb-8 card-modern-elevated p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center gradient-success shadow-lg shadow-green-500/25">
+                    <x-heroicon-o-check-circle class="w-5 h-5 text-white" />
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Dagens arbetspass</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $completedTimeLogs->count() }} avslutade pass</p>
+                </div>
+            </div>
+            <div class="space-y-3">
+                @foreach($completedTimeLogs as $timeLog)
+                    <div class="card-modern p-4 bg-gray-50 dark:bg-gray-800">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                <div>
+                                    <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $timeLog->station->name }}</span>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                                        {{ $timeLog->clock_in->format('H:i') }} - {{ $timeLog->clock_out->format('H:i') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-mono font-bold text-gray-700 dark:text-gray-300">
+                                    {{ number_format($timeLog->total_minutes / 60, 1) }}h
+                                </div>
+                                <div class="text-xs text-gray-600 dark:text-gray-400">
+                                    {{ $timeLog->total_minutes }} min
+                                </div>
+                            </div>
+                        </div>
+                        @if($timeLog->notes)
+                            <div class="mt-2 text-sm text-gray-600 dark:text-gray-400 italic">
+                                Anteckning: {{ $timeLog->notes }}
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- Enhanced Stations and Tasks --}}
     <div class="grid gap-8 lg:grid-cols-2">
         @forelse($userStations as $station)
-            <div class="card-modern overflow-hidden">
+            <div class="card-modern-elevated overflow-hidden">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                                <x-heroicon-o-building-storefront class="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                            <div class="w-8 h-8 rounded-lg gradient-purple shadow-lg shadow-purple-500/25 flex items-center justify-center">
+                                <x-heroicon-o-building-storefront class="w-4 h-4 text-white" />
                             </div>
                             <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ $station->name }}</h3>
                         </div>
@@ -158,6 +202,7 @@
                                 variant="primary"
                                 wire:click="clockIn({{ $station->id }})"
                                 icon="clock"
+                                class="gradient-primary text-white cursor-pointer"
                             >
                                 Klocka in
                             </flux:button>
@@ -178,12 +223,14 @@
                     
                     @if($stationTasks->count() > 0)
                         <div class="flex items-center gap-2 mb-4">
-                            <x-heroicon-o-clipboard-document-list class="w-4 h-4 text-gray-600" style="width: 16px; height: 16px;" />
+                            <div class="w-5 h-5 rounded gradient-orange shadow-lg shadow-orange-500/25 flex items-center justify-center">
+                                <x-heroicon-o-clipboard-document-list class="w-3 h-3 text-white" style="width: 12px; height: 12px;" />
+                            </div>
                             <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Dagens uppgifter ({{ $stationTasks->count() }})</h4>
                         </div>
                         <div class="space-y-3">
                             @foreach($stationTasks as $taskSchedule)
-                                <div class="card-modern p-4 
+                                <div class="card-modern-elevated p-4 
                                     {{ $taskSchedule->status === 'completed' ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-700' : 
                                        ($taskSchedule->status === 'overdue' ? 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-700' : 
                                         'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700') }}">
@@ -200,8 +247,9 @@
                                             @else
                                                 <input 
                                                     type="checkbox" 
-                                                    class="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+                                                    class="w-5 h-5 text-primary-600 rounded focus:ring-primary-500 cursor-pointer"
                                                     wire:click="completeTask({{ $taskSchedule->id }})"
+                                                    style="cursor: pointer;"
                                                 />
                                             @endif
                                             

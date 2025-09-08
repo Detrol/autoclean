@@ -44,6 +44,14 @@ class Dashboard extends Component
             ->active()
             ->with('station')
             ->get();
+        
+        // Hämta dagens avslutade tidslogs
+        $completedTimeLogs = $user->timeLogs()
+            ->whereDate('date', $today)
+            ->completed()
+            ->with('station')
+            ->orderBy('clock_in', 'desc')
+            ->get();
 
         // Statistik för användaren
         $stats = [
@@ -51,16 +59,17 @@ class Dashboard extends Component
                 ->where('completed_by', $user->id)->count(),
             'pending_today' => $todaysTasks->where('status', 'pending')->count(),
             'overdue_today' => $todaysTasks->where('status', 'overdue')->count(),
-            'total_hours_today' => $user->timeLogs()
+            'total_hours_today' => max(0, $user->timeLogs()
                 ->whereDate('date', $today)
                 ->completed()
-                ->sum('total_minutes') / 60,
+                ->sum('total_minutes') / 60),
         ];
 
         return view('livewire.employee.dashboard', [
             'userStations' => $userStations,
             'tasksByStation' => $tasksByStation,
             'activeTimeLogs' => $activeTimeLogs,
+            'completedTimeLogs' => $completedTimeLogs,
             'stats' => $stats,
             'selectedDate' => $today,
         ]);
@@ -106,10 +115,18 @@ class Dashboard extends Component
     public function completeTask($taskScheduleId)
     {
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
+        $user = Auth::user();
+        $stationId = $taskSchedule->task->station_id;
         
         // Kontrollera att användaren har tillgång till stationen
-        if (!Auth::user()->stations->contains($taskSchedule->task->station_id)) {
+        if (!$user->stations->contains($stationId)) {
             session()->flash('error', 'Du har inte behörighet att slutföra denna uppgift.');
+            return;
+        }
+        
+        // Kontrollera att användaren är inklockat på denna station
+        if (!$user->hasActiveTimeLog($stationId)) {
+            session()->flash('error', 'Du måste vara inklockat på stationen för att markera uppgifter som slutförda.');
             return;
         }
 
@@ -121,10 +138,18 @@ class Dashboard extends Component
     public function uncompleteTask($taskScheduleId)
     {
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
+        $user = Auth::user();
+        $stationId = $taskSchedule->task->station_id;
         
         // Kontrollera att användaren har tillgång till stationen
-        if (!Auth::user()->stations->contains($taskSchedule->task->station_id)) {
+        if (!$user->stations->contains($stationId)) {
             session()->flash('error', 'Du har inte behörighet att ändra denna uppgift.');
+            return;
+        }
+        
+        // Kontrollera att användaren är inklockat på denna station
+        if (!$user->hasActiveTimeLog($stationId)) {
+            session()->flash('error', 'Du måste vara inklockat på stationen för att avmarkera uppgifter.');
             return;
         }
 

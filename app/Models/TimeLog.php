@@ -54,7 +54,16 @@ class TimeLog extends Model
     public function clockOut($notes = null)
     {
         $clockOut = now();
-        $totalMinutes = $clockOut->diffInMinutes($this->clock_in);
+        // Beräkna minuter från clock_in till clock_out
+        $clockIn = $this->clock_in;
+        
+        // Säkerställ att vi alltid får positiva minuter
+        if ($clockOut->greaterThan($clockIn)) {
+            $totalMinutes = $clockIn->diffInMinutes($clockOut);
+        } else {
+            // Om något är fel med tiderna, sätt 0
+            $totalMinutes = 0;
+        }
 
         $this->update([
             'clock_out' => $clockOut,
