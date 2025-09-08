@@ -1,0 +1,172 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    /* Enhanced color system */
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-900: #0c4a6e;
+
+    --color-success-50: #f0fdf4;
+    --color-success-500: #22c55e;
+    --color-success-600: #16a34a;
+
+    --color-warning-50: #fefce8;
+    --color-warning-500: #eab308;
+    --color-warning-600: #ca8a04;
+
+    --color-danger-50: #fef2f2;
+    --color-danger-500: #ef4444;
+    --color-danger-600: #dc2626;
+
+    /* Enhanced shadows */
+    --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-medium: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+    --shadow-large: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.08);
+
+    --color-accent: var(--color-primary-600);
+    --color-accent-content: var(--color-primary-600);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+
+    /* Enhanced base styles */
+    body {
+        @apply antialiased;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+        min-height: 100vh;
+    }
+
+    .dark body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f1419 100%);
+    }
+
+    /* Custom utility classes */
+    .glass-effect {
+        @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50;
+    }
+
+    .card-modern {
+        @apply bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200/60 dark:border-gray-700/60 transition-all duration-300;
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(10px);
+    }
+
+    .card-modern:hover {
+        @apply bg-white/95 dark:bg-gray-800/95 transform scale-[1.02];
+        box-shadow: var(--shadow-medium);
+    }
+
+    .card-modern-elevated {
+        @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200/60 dark:border-gray-700/60 transition-all duration-300;
+        box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .card-modern-elevated:hover {
+        @apply transform -translate-y-1;
+        box-shadow: 0 20px 40px -10px rgb(0 0 0 / 0.15), 0 8px 16px -4px rgb(0 0 0 / 0.1);
+    }
+
+    .btn-primary-modern {
+        @apply inline-flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-all duration-200 
+               bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/20 
+               active:scale-95;
+    }
+
+    .input-modern {
+        @apply focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors duration-200;
+    }
+
+    .status-badge {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full;
+    }
+
+    .gradient-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+    }
+
+    .gradient-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    }
+
+    .gradient-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+    }
+
+    .gradient-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+    }
+
+    .gradient-purple {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+    }
+
+    .gradient-pink {
+        background: linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%);
+    }
+
+    .gradient-orange {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */

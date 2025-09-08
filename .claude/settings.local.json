@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan make:migration:*)",
+      "Bash(php artisan:*)",
+      "WebSearch",
+      "mcp__zen__challenge"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
