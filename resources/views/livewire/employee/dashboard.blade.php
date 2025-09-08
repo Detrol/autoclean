@@ -168,7 +168,7 @@
                                     {{ number_format($timeLog->total_minutes / 60, 1) }}h
                                 </div>
                                 <div class="text-xs text-gray-600 dark:text-gray-400">
-                                    {{ $timeLog->total_minutes }} min
+                                    {{ round($timeLog->total_minutes) }} min
                                 </div>
                             </div>
                         </div>
