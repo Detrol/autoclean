@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Schedule task generation to run daily at midnight
-app(Schedule::class)->command('tasks:generate')->dailyAt('00:01');
+// Schedule task generation to run every 15 minutes for real-time overdue detection
+app(Schedule::class)->command('tasks:generate')->everyFifteenMinutes();
