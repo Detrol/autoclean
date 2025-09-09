@@ -4,44 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Station extends Model
+class InventoryItem extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
         'description',
+        'unit',
+        'default_reorder_level',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'default_reorder_level' => 'integer',
     ];
 
-    public function tasks(): HasMany
-    {
-        return $this->hasMany(Task::class);
-    }
-
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'user_stations');
-    }
-
-    public function timeLogs(): HasMany
-    {
-        return $this->hasMany(TimeLog::class);
-    }
-
-    public function inventory(): HasMany
+    public function stationInventory(): HasMany
     {
         return $this->hasMany(StationInventory::class);
     }
 
-    public function inventoryTransactions(): HasMany
+    public function transactions(): HasMany
     {
         return $this->hasMany(InventoryTransaction::class);
     }
@@ -49,5 +36,16 @@ class Station extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function getFormattedUnitAttribute(): string
+    {
+        return match($this->unit) {
+            'pcs' => 'st',
+            'liters' => 'l',
+            'meters' => 'm',
+            'kg' => 'kg',
+            default => $this->unit,
+        };
     }
 }

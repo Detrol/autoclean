@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Employee;
 
+use App\Models\CompletedAdditionalTask;
 use App\Models\Station;
+use App\Models\StationInventory;
 use App\Models\TaskSchedule;
+use App\Models\TaskTemplate;
 use App\Models\TimeLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +15,14 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public $selectedDate;
+    public $taskComments = [];
+    public $showCommentForm = [];
+    
+    // Additional task properties
+    public $showAdditionalTaskForm = [];
+    public $selectedTemplateId = [];
+    public $customTaskName = [];
+    public $additionalTaskNotes = [];
 
     public function mount()
     {
@@ -65,6 +76,27 @@ class Dashboard extends Component
                 ->sum('total_minutes') / 60),
         ];
 
+        // Hämta task templates för alla stationer
+        $taskTemplates = TaskTemplate::active()
+            ->orderBy('name')
+            ->get();
+
+        // Hämta dagens additional tasks för alla stationer
+        $todayAdditionalTasks = CompletedAdditionalTask::whereIn('station_id', $userStations->pluck('id'))
+            ->forDate($today)
+            ->with(['user', 'taskTemplate', 'station'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('station_id');
+
+        // Hämta kritiska lagervarningar för användarens stationer
+        $criticalInventoryAlerts = StationInventory::whereIn('station_id', $userStations->pluck('id'))
+            ->with(['inventoryItem', 'station'])
+            ->whereRaw('current_quantity <= 0 OR current_quantity <= minimum_quantity')
+            ->orderBy('current_quantity', 'asc')
+            ->take(10)
+            ->get();
+
         return view('livewire.employee.dashboard', [
             'userStations' => $userStations,
             'tasksByStation' => $tasksByStation,
@@ -72,6 +104,9 @@ class Dashboard extends Component
             'completedTimeLogs' => $completedTimeLogs,
             'stats' => $stats,
             'selectedDate' => $today,
+            'taskTemplates' => $taskTemplates,
+            'todayAdditionalTasks' => $todayAdditionalTasks,
+            'criticalInventoryAlerts' => $criticalInventoryAlerts,
         ]);
     }
 
@@ -118,14 +153,14 @@ class Dashboard extends Component
         $user = Auth::user();
         $stationId = $taskSchedule->task->station_id;
         
-        // Kontrollera att användaren har tillgång till stationen
-        if (!$user->stations->contains($stationId)) {
+        // Kontrollera att användaren har tillgång till stationen (admins har alltid tillgång)
+        if (!$user->is_admin && !$user->stations->contains($stationId)) {
             session()->flash('error', 'Du har inte behörighet att slutföra denna uppgift.');
             return;
         }
         
-        // Kontrollera att användaren är inklockat på denna station
-        if (!$user->hasActiveTimeLog($stationId)) {
+        // Kontrollera att användaren är inklockat på denna station (gäller inte admins)
+        if (!$user->is_admin && !$user->hasActiveTimeLog($stationId)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att markera uppgifter som slutförda.');
             return;
         }
@@ -141,20 +176,20 @@ class Dashboard extends Component
         $user = Auth::user();
         $stationId = $taskSchedule->task->station_id;
         
-        // Kontrollera att användaren har tillgång till stationen
-        if (!$user->stations->contains($stationId)) {
+        // Kontrollera att användaren har tillgång till stationen (admins har alltid tillgång)
+        if (!$user->is_admin && !$user->stations->contains($stationId)) {
             session()->flash('error', 'Du har inte behörighet att ändra denna uppgift.');
             return;
         }
         
-        // Kontrollera att användaren är inklockat på denna station
-        if (!$user->hasActiveTimeLog($stationId)) {
+        // Kontrollera att användaren är inklockat på denna station (gäller inte admins)
+        if (!$user->is_admin && !$user->hasActiveTimeLog($stationId)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att avmarkera uppgifter.');
             return;
         }
 
-        // Kontrollera att det är användaren som slutförde uppgiften
-        if ($taskSchedule->completed_by !== Auth::id()) {
+        // Kontrollera att det är användaren som slutförde uppgiften (admins kan avmarkera alla)
+        if (!$user->is_admin && $taskSchedule->completed_by !== Auth::id()) {
             session()->flash('error', 'Du kan bara avmarkera uppgifter som du själv har slutfört.');
             return;
         }
@@ -165,5 +200,107 @@ class Dashboard extends Component
         $taskSchedule->save();
         
         session()->flash('message', 'Uppgift avmarkerad!');
+    }
+
+    public function toggleCommentForm($taskScheduleId)
+    {
+        $this->showCommentForm[$taskScheduleId] = !($this->showCommentForm[$taskScheduleId] ?? false);
+        
+        // Load existing comment if not already loaded
+        if (!isset($this->taskComments[$taskScheduleId])) {
+            $taskSchedule = TaskSchedule::find($taskScheduleId);
+            $this->taskComments[$taskScheduleId] = $taskSchedule->notes ?? '';
+        }
+    }
+
+    public function saveTaskComment($taskScheduleId)
+    {
+        $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
+        $user = Auth::user();
+        $stationId = $taskSchedule->task->station_id;
+        
+        // Kontrollera att användaren har tillgång till stationen (admins har alltid tillgång)
+        if (!$user->is_admin && !$user->stations->contains($stationId)) {
+            session()->flash('error', 'Du har inte behörighet att kommentera denna uppgift.');
+            return;
+        }
+        
+        $taskSchedule->update([
+            'notes' => $this->taskComments[$taskScheduleId] ?? null
+        ]);
+        
+        $this->showCommentForm[$taskScheduleId] = false;
+        session()->flash('message', 'Kommentar sparad!');
+    }
+
+    public function cancelComment($taskScheduleId)
+    {
+        $this->showCommentForm[$taskScheduleId] = false;
+        // Reset to original value
+        $taskSchedule = TaskSchedule::find($taskScheduleId);
+        $this->taskComments[$taskScheduleId] = $taskSchedule->notes ?? '';
+    }
+
+    public function showAddAdditionalTaskForm($stationId)
+    {
+        $user = Auth::user();
+        
+        // Kontrollera att användaren är inklockat på stationen
+        if (!$user->is_admin && !$user->hasActiveTimeLog($stationId)) {
+            session()->flash('error', 'Du måste vara inklockat på stationen för att lägga till extra uppgifter.');
+            return;
+        }
+
+        $this->showAdditionalTaskForm[$stationId] = true;
+        $this->selectedTemplateId[$stationId] = null;
+        $this->customTaskName[$stationId] = '';
+        $this->additionalTaskNotes[$stationId] = '';
+    }
+
+    public function hideAddAdditionalTaskForm($stationId)
+    {
+        $this->showAdditionalTaskForm[$stationId] = false;
+        $this->selectedTemplateId[$stationId] = null;
+        $this->customTaskName[$stationId] = '';
+        $this->additionalTaskNotes[$stationId] = '';
+    }
+
+    public function saveAdditionalTask($stationId)
+    {
+        $user = Auth::user();
+        
+        // Kontrollera att användaren är inklockat på stationen
+        if (!$user->is_admin && !$user->hasActiveTimeLog($stationId)) {
+            session()->flash('error', 'Du måste vara inklockat på stationen för att lägga till extra uppgifter.');
+            return;
+        }
+
+        // Bestäm task name
+        $taskName = '';
+        if ($this->selectedTemplateId[$stationId] ?? null) {
+            $template = TaskTemplate::find($this->selectedTemplateId[$stationId]);
+            $taskName = $template ? $template->name : '';
+        } else {
+            $taskName = trim($this->customTaskName[$stationId] ?? '');
+        }
+
+        // Validera att vi har ett task name
+        if (empty($taskName)) {
+            session()->flash('error', 'Du måste välja en mall eller ange ett anpassat namn för uppgiften.');
+            return;
+        }
+
+        // Spara additional task
+        CompletedAdditionalTask::create([
+            'station_id' => $stationId,
+            'user_id' => $user->id,
+            'task_template_id' => ($this->selectedTemplateId[$stationId] ?? null) ?: null,
+            'task_name' => $taskName,
+            'completed_date' => now()->format('Y-m-d'),
+            'notes' => ($this->additionalTaskNotes[$stationId] ?? null) ?: null,
+        ]);
+
+        $this->hideAddAdditionalTaskForm($stationId);
+        session()->flash('message', "Extra uppgift '{$taskName}' har lagts till!");
     }
 }

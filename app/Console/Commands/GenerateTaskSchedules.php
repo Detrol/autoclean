@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Task;
 use App\Models\TaskSchedule;
+use App\Services\RecurrenceCalculator;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -54,9 +55,10 @@ class GenerateTaskSchedules extends Command
     {
         $generatedCount = 0;
         $currentDate = $startDate->copy();
+        $calculator = new RecurrenceCalculator();
 
         while ($currentDate <= $endDate) {
-            if ($this->shouldGenerateTask($task, $currentDate)) {
+            if ($calculator->shouldGenerateTask($task, $currentDate)) {
                 // Kontrollera om uppgiften redan är schemalagd för denna dag
                 $existingSchedule = TaskSchedule::where('task_id', $task->id)
                     ->whereDate('scheduled_date', $currentDate)
@@ -82,39 +84,6 @@ class GenerateTaskSchedules extends Command
         return $generatedCount;
     }
 
-    private function shouldGenerateTask(Task $task, Carbon $date): bool
-    {
-        switch ($task->interval_type) {
-            case 'daily':
-                // Varje X dag
-                $daysSinceEpoch = $date->diffInDays(Carbon::createFromDate(2024, 1, 1));
-                return $daysSinceEpoch % $task->interval_value === 0;
-
-            case 'weekly':
-                // Varje X vecka på måndagar
-                if ($date->dayOfWeek !== Carbon::MONDAY) {
-                    return false;
-                }
-                $weeksSinceEpoch = $date->diffInWeeks(Carbon::createFromDate(2024, 1, 1)->startOfWeek());
-                return $weeksSinceEpoch % $task->interval_value === 0;
-
-            case 'monthly':
-                // Varje X månad på den första dagen
-                if ($date->day !== 1) {
-                    return false;
-                }
-                $monthsSinceEpoch = $date->diffInMonths(Carbon::createFromDate(2024, 1, 1));
-                return $monthsSinceEpoch % $task->interval_value === 0;
-
-            case 'custom':
-                // Anpassat intervall i dagar
-                $daysSinceEpoch = $date->diffInDays(Carbon::createFromDate(2024, 1, 1));
-                return $daysSinceEpoch % $task->interval_value === 0;
-
-            default:
-                return false;
-        }
-    }
 
     private function calculateDueTime(Task $task, Carbon $date): string
     {
@@ -127,9 +96,11 @@ class GenerateTaskSchedules extends Command
             case 'daily':
                 return '18:00:00'; // Dagliga uppgifter till 18:00
             case 'weekly':
-                return '17:00:00'; // Veckoupgifter till 17:00 på fredagar
+                return '17:00:00'; // Veckoupgifter till 17:00
             case 'monthly':
                 return '16:00:00'; // Månadsuppgifter till 16:00
+            case 'yearly':
+                return '15:00:00'; // Årliga uppgifter till 15:00
             case 'custom':
                 return '19:00:00'; // Anpassade uppgifter till 19:00
             default:

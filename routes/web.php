@@ -1,7 +1,9 @@
 <?php
 
+use App\Livewire\Admin\InventoryManager;
 use App\Livewire\Admin\StationManager;
 use App\Livewire\Admin\TaskManager;
+use App\Livewire\Admin\TaskTemplates;
 use App\Livewire\Admin\UserStationManager;
 use App\Livewire\Employee\StationDetails;
 use App\Livewire\Settings\Appearance;
@@ -34,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('can:admin')->group(function () {
         Route::get('admin/stations', StationManager::class)->name('admin.stations');
         Route::get('admin/tasks', TaskManager::class)->name('admin.tasks');
+        Route::get('admin/templates', TaskTemplates::class)->name('admin.templates');
+        Route::get('admin/inventory', InventoryManager::class)->name('admin.inventory');
         Route::get('admin/users', UserStationManager::class)->name('admin.users');
     });
 });

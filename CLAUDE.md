@@ -93,7 +93,7 @@ Complete authentication system with:
 ### Database Conventions
 - Migrations use anonymous classes
 - Factories defined for all models in `database/factories/`
-- SQLite for testing (in-memory), configurable for MySQL/PostgreSQL in production
+- MySQL database in development and production
 - Soft deletes implemented where appropriate
 
 ### Testing Strategy
@@ -110,9 +110,13 @@ Complete authentication system with:
 - **Models**: `app/Models/` following Eloquent conventions
 - **Middleware**: `app/Http/Middleware/` for request filtering
 
+## Development Environment
+- **Local Server**: nginx server runs locally, so avoid `php artisan serve` 
+- **Database**: MySQL configured in `.env` (changed from SQLite)
+
 ## Development Workflow
 1. Create Livewire components: `php artisan make:livewire ComponentName`
 2. Run tests after changes: `./vendor/bin/pest`
 3. Format code before commits: `./vendor/bin/pint`
-4. Use `composer dev` for full-stack development
+4. Use `composer dev` for full-stack development (excluding php artisan serve)
 5. Database changes require migrations: `php artisan make:migration`

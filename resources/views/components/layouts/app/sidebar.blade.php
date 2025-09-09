@@ -23,6 +23,8 @@
                 <flux:navlist.group heading="Administration" class="grid">
                     <flux:navlist.item icon="building-storefront" :href="route('admin.stations')" :current="request()->routeIs('admin.stations')" wire:navigate>Stationer</flux:navlist.item>
                     <flux:navlist.item icon="clipboard-document-list" :href="route('admin.tasks')" :current="request()->routeIs('admin.tasks')" wire:navigate>Uppgifter</flux:navlist.item>
+                    <flux:navlist.item icon="squares-plus" :href="route('admin.templates')" :current="request()->routeIs('admin.templates')" wire:navigate>Uppgiftsmallar</flux:navlist.item>
+                    <flux:navlist.item icon="archive-box" :href="route('admin.inventory')" :current="request()->routeIs('admin.inventory')" wire:navigate>Lagerhantering</flux:navlist.item>
                     <flux:navlist.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>Användare</flux:navlist.item>
                 </flux:navlist.group>
                 @endcan

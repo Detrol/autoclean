@@ -71,35 +71,29 @@
                     </div>
                 </div>
 
+                {{-- Startdatum och intervalltyp --}}
                 <div class="grid gap-4 md:grid-cols-3 mt-4">
                     <div>
+                        <flux:label for="start_date">Startdatum</flux:label>
+                        <flux:input 
+                            wire:model.blur="start_date" 
+                            name="start_date" 
+                            type="date"
+                            min="{{ now()->format('Y-m-d') }}"
+                        />
+                        @error('start_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    
+                    <div>
                         <flux:label for="interval_type">Intervall typ</flux:label>
-                        <flux:select wire:model="interval_type" name="interval_type">
+                        <flux:select wire:model.live="interval_type" name="interval_type">
                             <option value="daily">Dagligen</option>
                             <option value="weekly">Veckovis</option>
                             <option value="monthly">Månadsvis</option>
+                            <option value="yearly">Årligen</option>
                             <option value="custom">Anpassat</option>
                         </flux:select>
                         @error('interval_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <flux:label for="interval_value">Intervall värde</flux:label>
-                        <flux:input 
-                            wire:model="interval_value" 
-                            name="interval_value" 
-                            type="number" 
-                            min="1"
-                            placeholder="1"
-                        />
-                        <div class="text-xs text-gray-500 mt-1">
-                            @if($interval_type === 'custom')
-                                Antal dagar
-                            @else
-                                Varje X {{ $interval_type === 'daily' ? 'dag' : ($interval_type === 'weekly' ? 'vecka' : 'månad') }}
-                            @endif
-                        </div>
-                        @error('interval_value') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
@@ -112,6 +106,169 @@
                         @error('default_due_time') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>
+
+                {{-- Dynamiska intervall-inställningar --}}
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-4">Intervallkonfiguration</h4>
+                    
+                    @if($interval_type === 'daily')
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" wire:model.live="weekdays_only" value="0" name="daily_type" class="w-4 h-4 text-primary-600">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Varje 
+                                        <input type="number" wire:model.live="interval_value" min="1" max="365" class="w-16 px-2 py-1 text-sm border rounded mx-1">
+                                        dag(ar)
+                                    </span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" wire:model.live="weekdays_only" value="1" name="daily_type" class="w-4 h-4 text-primary-600">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Endast vardagar (måndag-fredag)</span>
+                                </label>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($interval_type === 'weekly')
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Upprepa var</span>
+                                <input type="number" wire:model.live="interval_value" min="1" max="52" class="w-16 px-2 py-1 text-sm border rounded">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">vecka/veckor</span>
+                            </div>
+                            
+                            <div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">På dessa dagar:</span>
+                                <div class="grid grid-cols-7 gap-2">
+                                    @php
+                                        $weekdays = [
+                                            'monday' => 'Mån',
+                                            'tuesday' => 'Tis', 
+                                            'wednesday' => 'Ons',
+                                            'thursday' => 'Tor',
+                                            'friday' => 'Fre',
+                                            'saturday' => 'Lör',
+                                            'sunday' => 'Sön'
+                                        ];
+                                    @endphp
+                                    @foreach($weekdays as $value => $label)
+                                        <label class="flex flex-col items-center gap-1">
+                                            <input type="checkbox" wire:model.live="selected_weekdays" value="{{ $value }}" class="w-4 h-4 text-primary-600">
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">{{ $label }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($interval_type === 'monthly')
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Upprepa var</span>
+                                <input type="number" wire:model.live="interval_value" min="1" max="12" class="w-16 px-2 py-1 text-sm border rounded">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">månad(er)</span>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" wire:model.live="monthly_type" value="date" name="monthly_type" class="w-4 h-4 text-primary-600">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">På dag 
+                                        <input type="number" wire:model.live="monthly_date" min="1" max="31" class="w-16 px-2 py-1 text-sm border rounded mx-1">
+                                        i månaden
+                                    </span>
+                                </label>
+                                
+                                <label class="flex items-start gap-2">
+                                    <input type="radio" wire:model.live="monthly_type" value="weekday" name="monthly_type" class="w-4 h-4 text-primary-600 mt-1">
+                                    <div class="space-y-2">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">På specifik veckodag:</span>
+                                        <div class="flex items-center gap-2">
+                                            <select wire:model.live="monthly_weekday_ordinal" class="px-2 py-1 text-sm border rounded">
+                                                <option value="1">Första</option>
+                                                <option value="2">Andra</option>
+                                                <option value="3">Tredje</option>
+                                                <option value="4">Fjärde</option>
+                                                <option value="5">Sista</option>
+                                            </select>
+                                            <select wire:model.live="monthly_weekday" class="px-2 py-1 text-sm border rounded">
+                                                <option value="monday">Måndag</option>
+                                                <option value="tuesday">Tisdag</option>
+                                                <option value="wednesday">Onsdag</option>
+                                                <option value="thursday">Torsdag</option>
+                                                <option value="friday">Fredag</option>
+                                                <option value="saturday">Lördag</option>
+                                                <option value="sunday">Söndag</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($interval_type === 'yearly')
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            Uppgiften kommer att upprepas varje år på samma datum som startdatumet.
+                        </div>
+                    @endif
+
+                    @if($interval_type === 'custom')
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Varje</span>
+                                <input type="number" wire:model.live="interval_value" min="1" max="365" class="w-16 px-2 py-1 text-sm border rounded">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">dagar</span>
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                Mer avancerade anpassningar kommer i framtida uppdateringar.
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Slutvillkor --}}
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-4">Slutvillkor</h4>
+                    
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-2">
+                            <input type="radio" wire:model.live="end_type" value="never" name="end_type" class="w-4 h-4 text-primary-600">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Aldrig (fortsätt för alltid)</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="radio" wire:model.live="end_type" value="date" name="end_type" class="w-4 h-4 text-primary-600">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Sluta efter 
+                                <input type="date" wire:model="end_date" class="px-2 py-1 text-sm border rounded mx-1">
+                            </span>
+                        </label>
+                        @error('end_date') <span class="text-red-500 text-sm block ml-6">{{ $message }}</span> @enderror
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="radio" wire:model.live="end_type" value="occurrences" name="end_type" class="w-4 h-4 text-primary-600">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Sluta efter 
+                                <input type="number" wire:model="occurrences" min="1" class="w-20 px-2 py-1 text-sm border rounded mx-1">
+                                gånger
+                            </span>
+                        </label>
+                        @error('occurrences') <span class="text-red-500 text-sm block ml-6">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                {{-- Förhandsvisning --}}
+                @if(!empty($preview_dates))
+                    <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">Förhandsvisning - Nästa 5 datum:</h4>
+                        <div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                            @foreach($preview_dates as $date)
+                                <div>{{ $date->translatedFormat('l j F Y') }}</div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 <div class="grid gap-4 md:grid-cols-2 mt-4">
                     <div>
@@ -196,23 +353,24 @@
                                         {{ $task->station->name }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4">
                                     <span class="text-sm text-gray-600 dark:text-gray-400">
-                                        @switch($task->interval_type)
-                                            @case('daily')
-                                                Varje {{ $task->interval_value == 1 ? 'dag' : $task->interval_value . ' dagar' }}
-                                                @break
-                                            @case('weekly')
-                                                Varje {{ $task->interval_value == 1 ? 'vecka' : $task->interval_value . ' veckor' }}
-                                                @break
-                                            @case('monthly')
-                                                Varje {{ $task->interval_value == 1 ? 'månad' : $task->interval_value . ' månader' }}
-                                                @break
-                                            @case('custom')
-                                                Varje {{ $task->interval_value }} dagar
-                                                @break
-                                        @endswitch
+                                        {{ $task->getIntervalDescription() }}
                                     </span>
+                                    @if($task->start_date)
+                                        <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                            Startar: {{ $task->start_date->translatedFormat('j M Y') }}
+                                        </div>
+                                    @endif
+                                    @if($task->end_date)
+                                        <div class="text-xs text-gray-500 dark:text-gray-500">
+                                            Slutar: {{ $task->end_date->translatedFormat('j M Y') }}
+                                        </div>
+                                    @elseif($task->occurrences)
+                                        <div class="text-xs text-gray-500 dark:text-gray-500">
+                                            {{ $task->occurrences }} gånger
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     {{ $task->default_due_time ? $task->default_due_time->format('H:i') : '-' }}
