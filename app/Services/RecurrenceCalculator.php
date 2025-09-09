@@ -73,6 +73,20 @@ class RecurrenceCalculator
             }
         }
         
+        // Kontrollera jämn/ojämn vecka logik
+        if ($pattern && isset($pattern['weekType'])) {
+            $currentWeekNumber = (int) $date->format('W');
+            $isEvenWeek = ($currentWeekNumber % 2 === 0);
+            
+            if ($pattern['weekType'] === 'even' && !$isEvenWeek) {
+                return false;
+            }
+            
+            if ($pattern['weekType'] === 'odd' && $isEvenWeek) {
+                return false;
+            }
+        }
+        
         // För veckovisa intervaller, räkna från början av startveckan
         $startOfStartWeek = $startDate->copy()->startOfWeek();
         $startOfCurrentWeek = $date->copy()->startOfWeek();
