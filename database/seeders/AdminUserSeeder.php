@@ -12,7 +12,8 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::firstOrCreate(
+        // Skapa admin-användare
+        $adminUser = \App\Models\User::firstOrCreate(
             ['email' => 'admin@autoclean.se'],
             [
                 'name' => 'Admin Användare',
@@ -21,28 +22,6 @@ class AdminUserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-
-        // Skapa test-stationer
-        $stations = [
-            ['name' => 'Station 1', 'description' => 'Huvudstation för biltvätt', 'is_active' => true],
-            ['name' => 'Station 2', 'description' => 'Sekundärstation för tvätt', 'is_active' => true],
-            ['name' => 'Dammsugare', 'description' => 'Station för dammsugning', 'is_active' => true],
-        ];
-
-        $createdStations = [];
-        foreach ($stations as $stationData) {
-            $station = \App\Models\Station::firstOrCreate(
-                ['name' => $stationData['name']],
-                $stationData
-            );
-            $createdStations[] = $station;
-        }
-
-        // Tilldela admin-användaren till alla stationer
-        $adminUser = \App\Models\User::where('email', 'admin@autoclean.se')->first();
-        if ($adminUser) {
-            $adminUser->stations()->syncWithoutDetaching($createdStations);
-        }
 
         // Skapa en vanlig anställd
         $employee = \App\Models\User::firstOrCreate(
@@ -55,57 +34,16 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Tilldela anställd till Station 1 och Station 2
-        $employee->stations()->syncWithoutDetaching([$createdStations[0]->id, $createdStations[1]->id]);
+        // Tilldela användare till stationer efter att StationSeeder kört
+        $hammaroStation = \App\Models\Station::where('name', 'Hammarö')->first();
+        $vaxnasStation = \App\Models\Station::where('name', 'Våxnäs')->first();
 
-        // Skapa test-uppgifter
-        $tasks = [
-            [
-                'station_id' => $createdStations[0]->id,
-                'name' => 'Rengöring av tvättutrustning',
-                'description' => 'Rengör alla tvättborstar och slangar',
-                'interval_type' => 'daily',
-                'interval_value' => 1,
-                'default_due_time' => '18:00',
-                'is_active' => true,
-            ],
-            [
-                'station_id' => $createdStations[0]->id,
-                'name' => 'Kontrollera kemikalienivåer',
-                'description' => 'Se till att alla kemikalier är påfyllda',
-                'interval_type' => 'daily',
-                'interval_value' => 1,
-                'default_due_time' => '09:00',
-                'is_active' => true,
-            ],
-            [
-                'station_id' => $createdStations[1]->id,
-                'name' => 'Rengöring av station',
-                'description' => 'Allmän rengöring av stationsområde',
-                'interval_type' => 'daily',
-                'interval_value' => 1,
-                'default_due_time' => '17:00',
-                'is_active' => true,
-            ],
-            [
-                'station_id' => $createdStations[2]->id,
-                'name' => 'Tömma dammsugare',
-                'description' => 'Tömma och rengör dammsugarbehållare',
-                'interval_type' => 'weekly',
-                'interval_value' => 1,
-                'default_due_time' => '16:00',
-                'is_active' => true,
-            ],
-        ];
-
-        foreach ($tasks as $taskData) {
-            \App\Models\Task::firstOrCreate(
-                [
-                    'station_id' => $taskData['station_id'],
-                    'name' => $taskData['name']
-                ],
-                $taskData
-            );
+        if ($hammaroStation && $vaxnasStation) {
+            // Admin får tillgång till alla stationer
+            $adminUser->stations()->syncWithoutDetaching([$hammaroStation->id, $vaxnasStation->id]);
+            
+            // Anställd får tillgång till båda stationerna
+            $employee->stations()->syncWithoutDetaching([$hammaroStation->id, $vaxnasStation->id]);
         }
     }
 }

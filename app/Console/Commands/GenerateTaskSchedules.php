@@ -44,10 +44,13 @@ class GenerateTaskSchedules extends Command
         }
 
         $this->info("Generated {$generatedCount} task schedules successfully!");
-        
+
         // Markera försenade uppgifter
         $this->markOverdueTasks();
-        
+
+        // Flytta försenade uppgifter till dagens datum
+        $this->moveOverdueTasksToToday();
+
         return 0;
     }
 
@@ -55,7 +58,7 @@ class GenerateTaskSchedules extends Command
     {
         $generatedCount = 0;
         $currentDate = $startDate->copy();
-        $calculator = new RecurrenceCalculator();
+        $calculator = new RecurrenceCalculator;
 
         while ($currentDate <= $endDate) {
             if ($calculator->shouldGenerateTask($task, $currentDate)) {
@@ -64,7 +67,7 @@ class GenerateTaskSchedules extends Command
                     ->whereDate('scheduled_date', $currentDate)
                     ->first();
 
-                if (!$existingSchedule) {
+                if (! $existingSchedule) {
                     $dueTime = $this->calculateDueTime($task, $currentDate);
 
                     TaskSchedule::create([
@@ -83,7 +86,6 @@ class GenerateTaskSchedules extends Command
 
         return $generatedCount;
     }
-
 
     private function calculateDueTime(Task $task, Carbon $date): string
     {
@@ -122,6 +124,42 @@ class GenerateTaskSchedules extends Command
 
         if ($overdueTasks > 0) {
             $this->info("Marked {$overdueTasks} tasks as overdue.");
+        }
+    }
+
+    private function moveOverdueTasksToToday(): void
+    {
+        $today = now()->format('Y-m-d');
+
+        // Hitta alla försenade uppgifter från tidigare dagar
+        $overdueTasks = TaskSchedule::where('status', 'overdue')
+            ->whereDate('scheduled_date', '<', now())
+            ->get();
+
+        $movedCount = 0;
+
+        foreach ($overdueTasks as $overdueTask) {
+            // Kontrollera om samma uppgift redan är schemalagd för idag
+            $existsToday = TaskSchedule::where('task_id', $overdueTask->task_id)
+                ->whereDate('scheduled_date', $today)
+                ->exists();
+
+            if (! $existsToday) {
+                // Flytta uppgiften till idag, behåll status som 'overdue'
+                $originalDate = $overdueTask->scheduled_date->format('Y-m-d');
+
+                $overdueTask->update([
+                    'scheduled_date' => $today,
+                    'notes' => ($overdueTask->notes ? $overdueTask->notes."\n" : '').
+                               "Flyttad från {$originalDate} (försenad)",
+                ]);
+
+                $movedCount++;
+            }
+        }
+
+        if ($movedCount > 0) {
+            $this->info("Moved {$movedCount} overdue tasks to today.");
         }
     }
 }

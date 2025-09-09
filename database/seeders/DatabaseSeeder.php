@@ -16,7 +16,11 @@ class DatabaseSeeder extends Seeder
         // Only run in non-production or when specifically needed
         if (app()->environment('local', 'staging') || request()->has('force-seed')) {
             $this->call([
-                AdminUserSeeder::class,
+                StationSeeder::class,        // Skapa stationer först
+                TaskTemplateSeeder::class,   // Skapa task templates
+                TaskSeeder::class,           // Skapa uppgifter (kräver stationer)
+                AdminUserSeeder::class,      // Skapa användare och tilldela stationer
+                InventoryItemSeeder::class,  // Skapa inventory items
             ]);
         }
     }
