@@ -85,6 +85,10 @@ class RecurrenceCalculator
             if ($pattern['weekType'] === 'odd' && $isEvenWeek) {
                 return false;
             }
+            
+            // För weekType-uppgifter, hoppa över standardintervall-logiken och returnera true
+            // eftersom weekType redan bestämmer när uppgiften ska köras
+            return true;
         }
         
         // För veckovisa intervaller, räkna från början av startveckan
