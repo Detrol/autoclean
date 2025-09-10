@@ -307,14 +307,8 @@
                                                     {{ $taskSchedule->task->name }}
                                                 </span>
                                                 <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                                    @if($taskSchedule->due_time)
-                                                        <span class="inline-flex items-center gap-1">
-                                                            <x-heroicon-s-clock class="w-3 h-3" />
-                                                            Senast: {{ \Carbon\Carbon::parse($taskSchedule->due_time)->format('H:i') }}
-                                                        </span>
-                                                    @endif
                                                     @if($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
-                                                        <span class="ml-2">• Slutförd av {{ $taskSchedule->completedBy->name }}</span>
+                                                        <span>Slutförd av {{ $taskSchedule->completedBy->name }}</span>
                                                     @endif
                                                 </div>
                                             </div>

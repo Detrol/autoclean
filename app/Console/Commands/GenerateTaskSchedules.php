@@ -131,9 +131,13 @@ class GenerateTaskSchedules extends Command
     {
         $today = now()->format('Y-m-d');
 
-        // Hitta alla försenade uppgifter från tidigare dagar
-        $overdueTasks = TaskSchedule::where('status', 'overdue')
+        // Hitta alla försenade uppgifter från tidigare dagar (exkludera dagliga uppgifter)
+        $overdueTasks = TaskSchedule::with('task')
+            ->where('status', 'overdue')
             ->whereDate('scheduled_date', '<', now())
+            ->whereHas('task', function($query) {
+                $query->where('interval_type', '!=', 'daily');
+            })
             ->get();
 
         $movedCount = 0;
@@ -159,7 +163,7 @@ class GenerateTaskSchedules extends Command
         }
 
         if ($movedCount > 0) {
-            $this->info("Moved {$movedCount} overdue tasks to today.");
+            $this->info("Moved {$movedCount} overdue non-daily tasks to today.");
         }
     }
 }

@@ -96,15 +96,6 @@
                         @error('interval_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
-                    <div>
-                        <flux:label for="default_due_time">Standard färdig tid</flux:label>
-                        <flux:input 
-                            wire:model="default_due_time" 
-                            name="default_due_time" 
-                            type="time"
-                        />
-                        @error('default_due_time') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
                 </div>
 
                 {{-- Dynamiska intervall-inställningar --}}
@@ -323,9 +314,6 @@
                                 Intervall
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Standard tid
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Status
                             </th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -371,9 +359,6 @@
                                             {{ $task->occurrences }} gånger
                                         </div>
                                     @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $task->default_due_time ? $task->default_due_time->format('H:i') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $task->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">

@@ -31,49 +31,49 @@ class TaskSeeder extends Seeder
                 'description' => 'Kontrollera och töm soptunnor vid behov',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
             [
                 'name' => 'Kontrollera kemikalienivåer',
                 'description' => 'Kontrollera kemikalienivåer och fyll på vid behov',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
             [
                 'name' => 'Rengör golv och väggar i tvättbås',
                 'description' => 'Rengör golv och väggar i tvättbås',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
             [
                 'name' => 'Allmän kontroll av tvätthallen',
                 'description' => 'Allmän kontroll av tvätthallen',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
             [
                 'name' => 'Funktionstest av dammsugare',
                 'description' => 'Funktionstest av dammsugare',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
             [
                 'name' => 'Kontroll av polletter och kvittosystem',
                 'description' => 'Kontroll/rotering av polletter, dator och kvittosystem',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
             [
                 'name' => 'Kontroll av slangar och munstycken',
                 'description' => 'Kontroll av slangar och munstycken',
                 'interval_type' => 'daily',
                 'interval_value' => 1,
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
             ],
         ];
 
@@ -105,7 +105,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['monday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -116,7 +116,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['monday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -127,7 +127,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['monday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
 
@@ -140,7 +140,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -151,7 +151,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -162,7 +162,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -173,7 +173,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
 
@@ -187,7 +187,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['wednesday'],
                     'weekType' => 'odd'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -199,7 +199,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['wednesday'],
                     'weekType' => 'odd'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -211,7 +211,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['wednesday'],
                     'weekType' => 'odd'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -223,7 +223,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['wednesday'],
                     'weekType' => 'odd'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
 
@@ -237,7 +237,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['friday'],
                     'weekType' => 'even'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -249,7 +249,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['friday'],
                     'weekType' => 'even'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -261,7 +261,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['friday'],
                     'weekType' => 'even'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -273,7 +273,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['friday'],
                     'weekType' => 'even'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
 
@@ -286,7 +286,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['saturday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
             [
@@ -297,7 +297,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['saturday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
 
@@ -311,7 +311,7 @@ class TaskSeeder extends Seeder
                     'daysOfWeek' => ['friday'],
                     'weekType' => 'odd'
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
         ];
@@ -341,7 +341,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['monday', 'friday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
 
@@ -354,7 +354,7 @@ class TaskSeeder extends Seeder
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['friday']
                 ],
-                'default_due_time' => '21:00',
+                'default_due_time' => '23:59',
                 'is_active' => true,
             ],
         ];

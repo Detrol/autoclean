@@ -244,11 +244,6 @@
                                         <div class="text-gray-900 dark:text-gray-100">
                                             {{ $data['next_scheduled']->scheduled_date->format('j M Y') }}
                                         </div>
-                                        @if($data['next_scheduled']->due_time)
-                                            <div class="text-gray-600 dark:text-gray-400">
-                                                senast {{ $data['next_scheduled']->due_time->format('H:i') }}
-                                            </div>
-                                        @endif
                                     </div>
                                 @else
                                     <div class="text-sm text-gray-500 dark:text-gray-400 italic">

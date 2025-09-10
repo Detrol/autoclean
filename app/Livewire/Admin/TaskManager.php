@@ -20,7 +20,6 @@ class TaskManager extends Component
     public $start_date = '';
     public $end_date = '';
     public $occurrences = null;
-    public $default_due_time = '';
     public $is_active = true;
     public $editingTaskId = null;
     public $showCreateForm = false;
@@ -47,7 +46,6 @@ class TaskManager extends Component
         'start_date' => 'nullable|date|after_or_equal:today',
         'end_date' => 'nullable|date|after:start_date',
         'occurrences' => 'nullable|integer|min:1',
-        'default_due_time' => 'nullable|date_format:H:i',
         'is_active' => 'boolean',
     ];
 
@@ -79,7 +77,7 @@ class TaskManager extends Component
             'recurrence_pattern' => $this->buildRecurrencePattern(),
             'end_date' => $this->end_type === 'date' ? $this->end_date : null,
             'occurrences' => $this->end_type === 'occurrences' ? $this->occurrences : null,
-            'default_due_time' => $this->default_due_time ?: null,
+            'default_due_time' => '23:59',
             'is_active' => $this->is_active,
         ]);
 
@@ -102,7 +100,6 @@ class TaskManager extends Component
         $this->start_date = $task->start_date ? $task->start_date->format('Y-m-d') : '';
         $this->end_date = $task->end_date ? $task->end_date->format('Y-m-d') : '';
         $this->occurrences = $task->occurrences;
-        $this->default_due_time = $task->default_due_time ? $task->default_due_time->format('H:i') : '';
         $this->is_active = $task->is_active;
         
         // Sätt end_type baserat på befintliga värden
@@ -134,7 +131,7 @@ class TaskManager extends Component
             'recurrence_pattern' => $this->buildRecurrencePattern(),
             'end_date' => $this->end_type === 'date' ? $this->end_date : null,
             'occurrences' => $this->end_type === 'occurrences' ? $this->occurrences : null,
-            'default_due_time' => $this->default_due_time ?: null,
+            'default_due_time' => '23:59',
             'is_active' => $this->is_active,
         ]);
 
@@ -180,7 +177,7 @@ class TaskManager extends Component
     {
         $this->reset([
             'station_id', 'name', 'description', 'interval_type', 'interval_value', 
-            'start_date', 'end_date', 'occurrences', 'default_due_time', 'editingTaskId',
+            'start_date', 'end_date', 'occurrences', 'editingTaskId',
             'weekdays_only', 'selected_weekdays', 'monthly_type', 'monthly_date',
             'monthly_weekday_ordinal', 'monthly_weekday', 'end_type', 'preview_dates'
         ]);
