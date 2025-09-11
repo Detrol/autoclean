@@ -30,8 +30,8 @@ class GenerateTaskSchedules extends Command
     public function handle()
     {
         $days = (int) $this->option('days');
-        $startDate = now()->startOfDay();
-        $endDate = now()->addDays($days)->endOfDay();
+        $startDate = now()->addDay()->startOfDay(); // Start från imorgon
+        $endDate = now()->addDays($days + 1)->endOfDay(); // Kompensera för att vi börjar senare
 
         $this->info("Generating task schedules from {$startDate->format('Y-m-d')} to {$endDate->format('Y-m-d')}");
 
