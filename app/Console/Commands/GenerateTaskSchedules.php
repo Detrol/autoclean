@@ -15,14 +15,14 @@ class GenerateTaskSchedules extends Command
      *
      * @var string
      */
-    protected $signature = 'tasks:generate {--days=7 : Number of days to generate schedules for}';
+    protected $signature = 'tasks:generate {--days=7 : Number of days to generate schedules for} {--date= : Start date for generation (default: today)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate task schedules based on task intervals';
+    protected $description = 'Generate task schedules based on task intervals (moving overdue tasks is now handled by tasks:rollover-overdue)';
 
     /**
      * Execute the console command.
@@ -30,8 +30,14 @@ class GenerateTaskSchedules extends Command
     public function handle()
     {
         $days = (int) $this->option('days');
-        $startDate = now()->addDay()->startOfDay(); // Start från imorgon
-        $endDate = now()->addDays($days + 1)->endOfDay(); // Kompensera för att vi börjar senare
+        
+        // Använd custom date eller default till idag (nu när rollover är separat)
+        $startDateInput = $this->option('date');
+        $startDate = $startDateInput ? 
+            \Carbon\Carbon::parse($startDateInput)->startOfDay() : 
+            now()->startOfDay();
+        
+        $endDate = $startDate->copy()->addDays($days)->endOfDay();
 
         $this->info("Generating task schedules from {$startDate->format('Y-m-d')} to {$endDate->format('Y-m-d')}");
 
@@ -44,13 +50,7 @@ class GenerateTaskSchedules extends Command
         }
 
         $this->info("Generated {$generatedCount} task schedules successfully!");
-
-        // Markera försenade uppgifter
-        $this->markOverdueTasks();
-
-        // Flytta försenade uppgifter till dagens datum
-        $this->moveOverdueTasksToToday();
-
+        
         return 0;
     }
 
@@ -110,60 +110,4 @@ class GenerateTaskSchedules extends Command
         }
     }
 
-    private function markOverdueTasks(): void
-    {
-        $overdueTasks = TaskSchedule::where('status', 'pending')
-            ->where(function ($query) {
-                $query->whereDate('scheduled_date', '<', now())
-                    ->orWhere(function ($subQuery) {
-                        $subQuery->whereDate('scheduled_date', '=', now())
-                            ->whereTime('due_time', '<', now()->format('H:i:s'));
-                    });
-            })
-            ->update(['status' => 'overdue']);
-
-        if ($overdueTasks > 0) {
-            $this->info("Marked {$overdueTasks} tasks as overdue.");
-        }
-    }
-
-    private function moveOverdueTasksToToday(): void
-    {
-        $today = now()->format('Y-m-d');
-
-        // Hitta alla försenade uppgifter från tidigare dagar (exkludera dagliga uppgifter)
-        $overdueTasks = TaskSchedule::with('task')
-            ->where('status', 'overdue')
-            ->whereDate('scheduled_date', '<', now())
-            ->whereHas('task', function($query) {
-                $query->where('interval_type', '!=', 'daily');
-            })
-            ->get();
-
-        $movedCount = 0;
-
-        foreach ($overdueTasks as $overdueTask) {
-            // Kontrollera om samma uppgift redan är schemalagd för idag
-            $existsToday = TaskSchedule::where('task_id', $overdueTask->task_id)
-                ->whereDate('scheduled_date', $today)
-                ->exists();
-
-            if (! $existsToday) {
-                // Flytta uppgiften till idag, behåll status som 'overdue'
-                $originalDate = $overdueTask->scheduled_date->format('Y-m-d');
-
-                $overdueTask->update([
-                    'scheduled_date' => $today,
-                    'notes' => ($overdueTask->notes ? $overdueTask->notes."\n" : '').
-                               "Flyttad från {$originalDate} (försenad)",
-                ]);
-
-                $movedCount++;
-            }
-        }
-
-        if ($movedCount > 0) {
-            $this->info("Moved {$movedCount} overdue non-daily tasks to today.");
-        }
-    }
 }

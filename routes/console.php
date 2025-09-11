@@ -8,5 +8,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Schedule task generation to run every 15 minutes for real-time overdue detection
-app(Schedule::class)->command('tasks:generate')->everyFifteenMinutes();
+// Rollover overdue tasks first (at midnight)
+app(Schedule::class)->command('tasks:rollover-overdue')->dailyAt('00:00');
+
+// Then generate new tasks (5 minutes later to avoid race conditions)
+app(Schedule::class)->command('tasks:generate --date=tomorrow')->dailyAt('00:05')->withoutOverlapping();
