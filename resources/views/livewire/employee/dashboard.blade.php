@@ -266,7 +266,7 @@
                                     variant="filled"
                                     wire:click="clockInOncall({{ $station->id }})"
                                     icon="phone"
-                                    class="gradient-purple text-white cursor-pointer"
+                                    class="gradient-orange text-white cursor-pointer"
                                     title="Klocka in för jour"
                                 >
                                     Jour
