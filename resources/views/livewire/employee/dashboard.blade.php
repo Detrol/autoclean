@@ -251,7 +251,7 @@
                         </div>
                         
                         @if(!auth()->user()->hasActiveTimeLog($station->id))
-                            <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
                                 <flux:button
                                     size="sm"
                                     variant="primary"
@@ -263,10 +263,10 @@
                                 </flux:button>
                                 <flux:button
                                     size="sm"
-                                    variant="ghost"
+                                    variant="filled"
                                     wire:click="clockInOncall({{ $station->id }})"
                                     icon="phone"
-                                    class="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 hover:border-purple-700"
+                                    class="gradient-purple text-white cursor-pointer"
                                     title="Klocka in för jour"
                                 >
                                     Jour
