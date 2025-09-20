@@ -13,6 +13,7 @@ class TimeLog extends Model
     protected $fillable = [
         'user_id',
         'station_id',
+        'is_oncall',
         'clock_in',
         'clock_out',
         'date',
@@ -24,6 +25,7 @@ class TimeLog extends Model
         'clock_in' => 'datetime',
         'clock_out' => 'datetime',
         'date' => 'date',
+        'is_oncall' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -86,5 +88,44 @@ class TimeLog extends Model
     public function isActive()
     {
         return is_null($this->clock_out);
+    }
+
+    public function scopeForWeek($query, $date)
+    {
+        $startOfWeek = \Carbon\Carbon::parse($date)->startOfWeek();
+        $endOfWeek = \Carbon\Carbon::parse($date)->endOfWeek();
+
+        return $query->whereBetween('date', [$startOfWeek, $endOfWeek]);
+    }
+
+    public function scopeForMonth($query, $date)
+    {
+        $month = \Carbon\Carbon::parse($date)->month;
+        $year = \Carbon\Carbon::parse($date)->year;
+
+        return $query->whereMonth('date', $month)
+                     ->whereYear('date', $year);
+    }
+
+    public function scopeForYear($query, $date)
+    {
+        $year = \Carbon\Carbon::parse($date)->year;
+
+        return $query->whereYear('date', $year);
+    }
+
+    public function scopeForDateRange($query, $startDate, $endDate)
+    {
+        return $query->whereBetween('date', [$startDate, $endDate]);
+    }
+
+    public function scopeOncall($query)
+    {
+        return $query->where('is_oncall', true);
+    }
+
+    public function scopeRegular($query)
+    {
+        return $query->where('is_oncall', false);
     }
 }

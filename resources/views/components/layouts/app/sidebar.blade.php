@@ -17,6 +17,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="clock" :href="route('time-reports')" :current="request()->routeIs('time-reports')" wire:navigate>Tidsrapporter</flux:navlist.item>
                 </flux:navlist.group>
 
                 @can('admin')

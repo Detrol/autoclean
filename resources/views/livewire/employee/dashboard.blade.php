@@ -150,8 +150,13 @@
                                 <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                                 <div>
                                     <span class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $timeLog->station->name }}</span>
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                                        Startad: {{ $timeLog->clock_in->format('H:i') }}
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                                            Startad: {{ $timeLog->clock_in->format('H:i') }}
+                                        </span>
+                                        @if($timeLog->is_oncall)
+                                            <flux:badge variant="purple" size="sm">Jour</flux:badge>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -200,8 +205,13 @@
                                 <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
                                 <div>
                                     <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $timeLog->station->name }}</span>
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $timeLog->clock_in->format('H:i') }} - {{ $timeLog->clock_out->format('H:i') }}
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ $timeLog->clock_in->format('H:i') }} - {{ $timeLog->clock_out->format('H:i') }}
+                                        </span>
+                                        @if($timeLog->is_oncall)
+                                            <flux:badge variant="purple" size="sm">Jour</flux:badge>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -241,15 +251,27 @@
                         </div>
                         
                         @if(!auth()->user()->hasActiveTimeLog($station->id))
-                            <flux:button 
-                                size="sm" 
-                                variant="primary"
-                                wire:click="clockIn({{ $station->id }})"
-                                icon="clock"
-                                class="gradient-primary text-white cursor-pointer"
-                            >
-                                Klocka in
-                            </flux:button>
+                            <div class="flex gap-2">
+                                <flux:button
+                                    size="sm"
+                                    variant="primary"
+                                    wire:click="clockIn({{ $station->id }})"
+                                    icon="clock"
+                                    class="gradient-primary text-white cursor-pointer"
+                                >
+                                    Klocka in
+                                </flux:button>
+                                <flux:button
+                                    size="sm"
+                                    variant="purple"
+                                    wire:click="clockInOncall({{ $station->id }})"
+                                    icon="phone"
+                                    class="gradient-purple text-white cursor-pointer"
+                                    title="Klocka in för jour"
+                                >
+                                    Jour
+                                </flux:button>
+                            </div>
                         @else
                             <div class="status-badge bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200">
                                 <x-heroicon-o-check class="w-3 h-3" />

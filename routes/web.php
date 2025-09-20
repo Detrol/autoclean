@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Employee routes
     Route::get('station/{id}', StationDetails::class)->name('station.details');
+    Route::get('time-reports', \App\Livewire\Employee\TimeReports::class)->name('time-reports');
 
     // Admin routes
     Route::middleware('can:admin')->group(function () {
