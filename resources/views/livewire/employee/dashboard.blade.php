@@ -155,7 +155,7 @@
                                             Startad: {{ $timeLog->clock_in->format('H:i') }}
                                         </span>
                                         @if($timeLog->is_oncall)
-                                            <flux:badge variant="purple" size="sm">Jour</flux:badge>
+                                            <span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200">Jour</span>
                                         @endif
                                     </div>
                                 </div>
@@ -210,7 +210,7 @@
                                             {{ $timeLog->clock_in->format('H:i') }} - {{ $timeLog->clock_out->format('H:i') }}
                                         </span>
                                         @if($timeLog->is_oncall)
-                                            <flux:badge variant="purple" size="sm">Jour</flux:badge>
+                                            <span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200">Jour</span>
                                         @endif
                                     </div>
                                 </div>
@@ -263,10 +263,10 @@
                                 </flux:button>
                                 <flux:button
                                     size="sm"
-                                    variant="purple"
+                                    variant="ghost"
                                     wire:click="clockInOncall({{ $station->id }})"
                                     icon="phone"
-                                    class="gradient-purple text-white cursor-pointer"
+                                    class="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 hover:border-purple-700"
                                     title="Klocka in för jour"
                                 >
                                     Jour

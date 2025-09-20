@@ -169,9 +169,9 @@
                             </td>
                             <td class="py-3 px-4 text-sm">
                                 @if($log->is_oncall)
-                                    <flux:badge variant="purple" size="sm">Jour</flux:badge>
+                                    <span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200">Jour</span>
                                 @else
-                                    <flux:badge variant="blue" size="sm">Ordinarie</flux:badge>
+                                    <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">Ordinarie</span>
                                 @endif
                             </td>
                             <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
