@@ -256,6 +256,7 @@
                                     size="sm"
                                     variant="primary"
                                     wire:click="clockIn({{ $station->id }})"
+                                    wire:confirm="Är du säker på att du vill klocka in för ordinarie arbetstid?"
                                     icon="clock"
                                     class="gradient-primary text-white cursor-pointer"
                                 >
@@ -265,8 +266,9 @@
                                     size="sm"
                                     variant="filled"
                                     wire:click="clockInOncall({{ $station->id }})"
+                                    wire:confirm="Är du säker på att du vill klocka in för jour?"
                                     icon="phone"
-                                    class="gradient-orange text-white cursor-pointer"
+                                    class="gradient-orange !text-white cursor-pointer"
                                     title="Klocka in för jour"
                                 >
                                     Jour

@@ -165,12 +165,6 @@ class Dashboard extends Component
             session()->flash('error', 'Du har inte behörighet att slutföra denna uppgift.');
             return;
         }
-        
-        // Kontrollera att användaren är inklockat på denna station (gäller inte admins)
-        if (!$user->is_admin && !$user->hasActiveTimeLog($stationId)) {
-            session()->flash('error', 'Du måste vara inklockat på stationen för att markera uppgifter som slutförda.');
-            return;
-        }
 
         $taskSchedule->markAsCompleted(Auth::id());
         
@@ -186,12 +180,6 @@ class Dashboard extends Component
         // Kontrollera att användaren har tillgång till stationen (admins har alltid tillgång)
         if (!$user->is_admin && !$user->stations->contains($stationId)) {
             session()->flash('error', 'Du har inte behörighet att ändra denna uppgift.');
-            return;
-        }
-        
-        // Kontrollera att användaren är inklockat på denna station (gäller inte admins)
-        if (!$user->is_admin && !$user->hasActiveTimeLog($stationId)) {
-            session()->flash('error', 'Du måste vara inklockat på stationen för att avmarkera uppgifter.');
             return;
         }
 
