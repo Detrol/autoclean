@@ -28,11 +28,16 @@ class RolloverOverdueTasks extends Command
     {
         $today = now()->format('Y-m-d');
 
-        // Markera försenade uppgifter först
+        // Markera försenade uppgifter först (körs alltid)
         $this->markOverdueTasks();
 
-        // Flytta försenade icke-dagliga uppgifter till idag
-        $this->moveOverdueTasksToToday();
+        // Kontrollera om rollover är aktiverat
+        if (config('tasks.rollover_enabled', true)) {
+            // Flytta försenade icke-dagliga uppgifter till idag
+            $this->moveOverdueTasksToToday();
+        } else {
+            $this->info('Task rollover is disabled. Overdue tasks will not be moved.');
+        }
 
         return 0;
     }

@@ -9,6 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Rollover overdue tasks first (at midnight)
+// This command will always run, but will check the config internally
 app(Schedule::class)->command('tasks:rollover-overdue')->dailyAt('00:00');
 
 // Then generate new tasks (5 minutes later to avoid race conditions)
