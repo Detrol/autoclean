@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Mail\EmployeeInvitation as EmployeeInvitationMail;
+use App\Models\EmployeeInvitation;
 use App\Models\Station;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -68,25 +71,39 @@ class UserStationManager extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'email' => 'required|email|unique:users,email|unique:employee_invitations,email',
             'is_admin' => 'boolean',
         ]);
 
-        $user = User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => Hash::make($this->password),
-            'is_admin' => $this->is_admin,
-            'email_verified_at' => now(),
-        ]);
+        // Check if there's already a pending invitation for this email
+        $existingInvitation = EmployeeInvitation::where('email', $this->email)
+            ->valid()
+            ->first();
 
-        // Tilldela stationer om några är valda
-        if (!empty($this->selectedStations)) {
-            $user->stations()->sync($this->selectedStations);
+        if ($existingInvitation) {
+            session()->flash('error', "Det finns redan en pågående inbjudan för {$this->email}");
+            return;
         }
 
-        session()->flash('message', "Användare {$this->name} skapad framgångsrikt!");
+        // Create the invitation
+        $invitation = EmployeeInvitation::create([
+            'email' => $this->email,
+            'name' => $this->name,
+            'token' => EmployeeInvitation::generateToken(),
+            'invited_by' => auth()->id(),
+            'expires_at' => now()->addDays(7),
+            'is_admin' => $this->is_admin,
+        ]);
+
+        // Send the invitation email
+        Mail::to($this->email)->send(new EmployeeInvitationMail($invitation));
+
+        // Store selected stations in session to be assigned after user creation
+        if (!empty($this->selectedStations)) {
+            session()->put("invitation_stations_{$invitation->id}", $this->selectedStations);
+        }
+
+        session()->flash('message', "Inbjudan skickad till {$this->name} ({$this->email})!");
         $this->resetForm();
         $this->showCreateForm = false;
     }

@@ -19,7 +19,7 @@
                 variant="primary"
                 icon="plus"
             >
-                Skapa ny användare
+                Bjud in användare
             </flux:button>
         @endif
     </div>
@@ -56,10 +56,10 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                        {{ $editingUserId ? 'Redigera användare' : 'Skapa ny användare' }}
+                        {{ $editingUserId ? 'Redigera användare' : 'Bjud in användare' }}
                     </h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ $editingUserId ? 'Uppdatera användarinformation och stationstilldelningar' : 'Lägg till en ny användare i systemet' }}
+                        {{ $editingUserId ? 'Uppdatera användarinformation och stationstilldelningar' : 'Bjud in en ny anställd till systemet' }}
                     </p>
                 </div>
             </div>
@@ -101,17 +101,18 @@
                     </div>
                 </div>
 
+                @if($editingUserId)
                 <div class="grid gap-6 md:grid-cols-2">
                     <div class="space-y-2">
-                        <flux:label for="password">{{ $editingUserId ? 'Nytt lösenord (lämna tomt för att behålla)' : 'Lösenord' }}</flux:label>
-                        <flux:input 
-                            wire:model="password" 
-                            name="password" 
-                            type="password" 
+                        <flux:label for="password">Nytt lösenord (lämna tomt för att behålla)</flux:label>
+                        <flux:input
+                            wire:model="password"
+                            name="password"
+                            type="password"
                             placeholder="Minst 8 tecken"
                             class="input-modern"
                         />
-                        @error('password') 
+                        @error('password')
                             <div class="flex items-center gap-2 text-danger-600 text-sm">
                                 <x-heroicon-o-exclamation-circle class="w-4 h-4" />
                                 {{ $message }}
@@ -121,15 +122,29 @@
 
                     <div class="space-y-2">
                         <flux:label for="password_confirmation">Bekräfta lösenord</flux:label>
-                        <flux:input 
-                            wire:model="password_confirmation" 
-                            name="password_confirmation" 
-                            type="password" 
+                        <flux:input
+                            wire:model="password_confirmation"
+                            name="password_confirmation"
+                            type="password"
                             placeholder="Upprepa lösenordet"
                             class="input-modern"
                         />
                     </div>
                 </div>
+                @else
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div class="flex items-start gap-3">
+                        <x-heroicon-o-information-circle class="w-5 h-5 text-blue-600 mt-0.5" />
+                        <div>
+                            <p class="text-sm text-blue-800 dark:text-blue-200 font-medium">Inbjudningssystem</p>
+                            <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                                Användaren kommer att få ett mail med en länk där de kan sätta sitt eget lösenord.
+                                Inbjudan är giltig i 7 dagar.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <div class="space-y-2">
                     <flux:label>Användartyp</flux:label>
@@ -172,7 +187,7 @@
 
                 <div class="flex gap-4 pt-4">
                     <flux:button type="submit" variant="primary" icon="check">
-                        {{ $editingUserId ? 'Uppdatera användare' : 'Skapa användare' }}
+                        {{ $editingUserId ? 'Uppdatera användare' : 'Skicka inbjudan' }}
                     </flux:button>
                     
                     <flux:button wire:click="toggleCreateForm" variant="ghost" icon="x-mark">

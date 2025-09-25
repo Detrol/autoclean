@@ -63,39 +63,4 @@
             </flux:button>
         </div>
     </form>
-
-    <!-- Enhanced Demo Accounts -->
-    <div class="card-modern p-6">
-        <div class="flex items-center gap-2 mb-4">
-            <x-heroicon-o-bolt class="w-4 h-4 text-blue-600" />
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Demo-konton</h3>
-        </div>
-        <div class="space-y-3">
-            <div class="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-100 dark:border-primary-800/30">
-                <div>
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">Administrator</div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400">admin@autoclean.se / password</div>
-                </div>
-                <div class="status-badge bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-200">
-                    Admin
-                </div>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-success-50 dark:bg-success-900/20 rounded-lg border border-success-100 dark:border-success-800/30">
-                <div>
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">Anställd</div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400">employee@autoclean.se / password</div>
-                </div>
-                <div class="status-badge bg-success-100 text-success-700 dark:bg-success-800 dark:text-success-200">
-                    Employee
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (Route::has('register'))
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-            <span>{{ __('Don\'t have an account?') }}</span>
-            <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-        </div>
-    @endif
 </div>
