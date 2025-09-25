@@ -9,12 +9,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 560px;
-            margin: 0 auto;
+            margin: 0;
             padding: 20px;
             background-color: #f8fafc;
         }
         .container {
+            max-width: 560px;
+            margin: 0 auto;
             background-color: white;
             border-radius: 12px;
             padding: 32px;
@@ -25,20 +26,14 @@
             margin-bottom: 32px;
         }
         .logo {
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             width: 56px;
             height: 56px;
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             border-radius: 12px;
             margin-bottom: 16px;
-            position: relative;
-        }
-        .logo::after {
-            content: '🧽';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             font-size: 24px;
         }
         h1 {
@@ -106,7 +101,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo"></div>
+            <div class="logo">🧽</div>
             <h1>WashNode</h1>
             <p class="subtitle">Stationshanteringssystem för biltvätt</p>
         </div>
