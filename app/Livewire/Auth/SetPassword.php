@@ -65,11 +65,9 @@ class SetPassword extends Component
             'email_verified_at' => now(),
         ]);
 
-        // Check if there are stored stations to assign
-        $storedStations = session()->get("invitation_stations_{$this->invitation->id}");
-        if ($storedStations) {
-            $user->stations()->sync($storedStations);
-            session()->forget("invitation_stations_{$this->invitation->id}");
+        // Assign stations from the invitation
+        if ($this->invitation->assigned_stations) {
+            $user->stations()->sync($this->invitation->assigned_stations);
         }
 
         // Mark invitation as accepted

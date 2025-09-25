@@ -25,18 +25,6 @@
             text-align: center;
             margin-bottom: 32px;
         }
-        .logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            border-radius: 12px;
-            margin: 0 auto 16px auto;
-            color: white;
-            font-size: 28px;
-        }
         h1 {
             color: #111827;
             margin: 0;
@@ -102,7 +90,6 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🏪</div>
             <h1>WashNode</h1>
             <p class="subtitle">Stationshanteringssystem för biltvätt</p>
         </div>

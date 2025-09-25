@@ -85,7 +85,7 @@ class UserStationManager extends Component
             return;
         }
 
-        // Create the invitation
+        // Create the invitation with assigned stations
         $invitation = EmployeeInvitation::create([
             'email' => $this->email,
             'name' => $this->name,
@@ -93,15 +93,11 @@ class UserStationManager extends Component
             'invited_by' => auth()->id(),
             'expires_at' => now()->addDays(7),
             'is_admin' => $this->is_admin,
+            'assigned_stations' => !empty($this->selectedStations) ? $this->selectedStations : null,
         ]);
 
         // Send the invitation email
         Mail::to($this->email)->send(new EmployeeInvitationMail($invitation));
-
-        // Store selected stations in session to be assigned after user creation
-        if (!empty($this->selectedStations)) {
-            session()->put("invitation_stations_{$invitation->id}", $this->selectedStations);
-        }
 
         session()->flash('message', "Inbjudan skickad till {$this->name} ({$this->email})!");
         $this->resetForm();

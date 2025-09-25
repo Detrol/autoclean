@@ -20,12 +20,14 @@ class EmployeeInvitation extends Model
         'accepted_at',
         'expires_at',
         'is_admin',
+        'assigned_stations',
     ];
 
     protected $casts = [
         'accepted_at' => 'datetime',
         'expires_at' => 'datetime',
         'is_admin' => 'boolean',
+        'assigned_stations' => 'array',
     ];
 
     /**
