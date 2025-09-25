@@ -9,74 +9,97 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 600px;
+            max-width: 560px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f8fafc;
         }
         .container {
             background-color: white;
-            border-radius: 8px;
-            padding: 40px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
         .logo {
             display: inline-block;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .logo::after {
+            content: '🧽';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
         }
         h1 {
-            color: #1f2937;
+            color: #111827;
             margin: 0;
             font-size: 28px;
+            font-weight: 700;
         }
         .subtitle {
             color: #6b7280;
-            margin-top: 5px;
+            margin-top: 4px;
             font-size: 16px;
         }
         .content {
-            margin-top: 30px;
+            margin-top: 24px;
         }
         .button {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 14px 32px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white !important;
+            padding: 16px 32px;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            margin: 30px 0;
+            margin: 24px 0;
             text-align: center;
+            border: none;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.25);
         }
         .button:hover {
-            opacity: 0.9;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
         }
         .info-box {
-            background-color: #f3f4f6;
-            border-left: 4px solid #667eea;
-            padding: 15px;
+            background-color: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
             margin: 20px 0;
-            border-radius: 4px;
+            border-radius: 6px;
         }
         .footer {
-            margin-top: 40px;
-            padding-top: 20px;
+            margin-top: 32px;
+            padding-top: 24px;
             border-top: 1px solid #e5e7eb;
             text-align: center;
             color: #6b7280;
-            font-size: 14px;
+            font-size: 13px;
         }
         .expires-warning {
-            color: #ef4444;
+            color: #dc2626;
             font-weight: 600;
+        }
+        .content p {
+            margin-bottom: 16px;
+        }
+        .content ul {
+            padding-left: 20px;
+        }
+        .content li {
+            margin-bottom: 8px;
         }
     </style>
 </head>
