@@ -11,7 +11,7 @@
                 <div class="w-8 h-8 rounded-lg gradient-primary shadow-md shadow-blue-500/25 flex items-center justify-center">
                     <x-heroicon-o-building-storefront class="w-5 h-5 text-white" />
                 </div>
-                <span class="text-lg font-bold text-gray-900 dark:text-white">AutoClean</span>
+                <span class="text-lg font-bold text-gray-900 dark:text-white">WashNode</span>
             </a>
 
             <flux:navlist variant="outline">

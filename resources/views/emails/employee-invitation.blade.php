@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inbjudan till AutoClean</title>
+    <title>Inbjudan till WashNode</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -84,14 +84,14 @@
     <div class="container">
         <div class="header">
             <div class="logo"></div>
-            <h1>AutoClean</h1>
+            <h1>WashNode</h1>
             <p class="subtitle">Stationshanteringssystem för biltvätt</p>
         </div>
 
         <div class="content">
             <p>Hej {{ $recipientName }}!</p>
 
-            <p>{{ $inviterName }} har bjudit in dig att ansluta till AutoClean - vårt stationshanteringssystem för biltvättar.</p>
+            <p>{{ $inviterName }} har bjudit in dig att ansluta till WashNode - vårt stationshanteringssystem för biltvättar.</p>
 
             <p>För att komma igång behöver du sätta ett lösenord för ditt konto. Klicka på knappen nedan för att slutföra registreringen:</p>
 
@@ -100,8 +100,8 @@
             </div>
 
             <div class="info-box">
-                <strong>Vad är AutoClean?</strong><br>
-                AutoClean är ett komplett system för att hantera:
+                <strong>Vad är WashNode?</strong><br>
+                WashNode är ett komplett system för att hantera:
                 <ul style="margin: 10px 0;">
                     <li>Schemaläggning av städuppgifter</li>
                     <li>Inventariehantering</li>
@@ -120,7 +120,7 @@
         <div class="footer">
             <p>Om du inte kan klicka på knappen, kopiera och klistra in följande länk i din webbläsare:</p>
             <p style="word-break: break-all; color: #667eea;">{{ $invitationUrl }}</p>
-            <p style="margin-top: 20px;">© {{ date('Y') }} AutoClean. Alla rättigheter förbehållna.</p>
+            <p style="margin-top: 20px;">© {{ date('Y') }} WashNode. Alla rättigheter förbehållna.</p>
         </div>
     </div>
 </body>

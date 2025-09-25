@@ -26,7 +26,7 @@ class EmployeeInvitation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Inbjudan till AutoClean - Stationshanteringssystem',
+            subject: 'Inbjudan till WashNode - Stationshanteringssystem',
         );
     }
 

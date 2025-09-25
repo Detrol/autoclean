@@ -6,7 +6,7 @@
             <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 gradient-primary shadow-lg shadow-blue-500/25">
                 <x-heroicon-o-building-storefront class="w-10 h-10 text-white" />
             </div>
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">AutoClean</h1>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">WashNode</h1>
             <p class="text-lg text-gray-600 dark:text-gray-400">Stationshanteringssystem för biltvätt</p>
         </div>
     </div>
@@ -19,7 +19,7 @@
             <x-heroicon-o-envelope class="w-5 h-5 text-blue-600 mt-0.5" />
             <div>
                 <p class="text-sm text-blue-800 dark:text-blue-200">
-                    Du har blivit inbjuden av <strong>{{ $invitation->inviter->name }}</strong> att gå med i AutoClean.
+                    Du har blivit inbjuden av <strong>{{ $invitation->inviter->name }}</strong> att gå med i WashNode.
                 </p>
                 <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
                     E-post: <strong>{{ $invitation->email }}</strong>
