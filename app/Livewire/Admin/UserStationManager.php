@@ -16,15 +16,22 @@ class UserStationManager extends Component
     use WithPagination;
 
     public $selectedUserId = '';
+
     public $selectedStations = [];
-    
+
     // Formulärfält för ny/redigerad användare
     public $showCreateForm = false;
+
     public $editingUserId = null;
+
     public $name = '';
+
     public $email = '';
+
     public $password = '';
+
     public $password_confirmation = '';
+
     public $is_admin = false;
 
     public function render()
@@ -44,8 +51,9 @@ class UserStationManager extends Component
 
     public function updateStations()
     {
-        if (!$this->selectedUserId) {
+        if (! $this->selectedUserId) {
             session()->flash('error', 'Välj en användare först.');
+
             return;
         }
 
@@ -63,7 +71,7 @@ class UserStationManager extends Component
 
     public function toggleCreateForm()
     {
-        $this->showCreateForm = !$this->showCreateForm;
+        $this->showCreateForm = ! $this->showCreateForm;
         $this->resetForm();
     }
 
@@ -82,6 +90,7 @@ class UserStationManager extends Component
 
         if ($existingInvitation) {
             session()->flash('error', "Det finns redan en pågående inbjudan för {$this->email}");
+
             return;
         }
 
@@ -93,7 +102,7 @@ class UserStationManager extends Component
             'invited_by' => auth()->id(),
             'expires_at' => now()->addDays(7),
             'is_admin' => $this->is_admin,
-            'assigned_stations' => !empty($this->selectedStations) ? $this->selectedStations : null,
+            'assigned_stations' => ! empty($this->selectedStations) ? $this->selectedStations : null,
         ]);
 
         // Send the invitation email
@@ -108,7 +117,7 @@ class UserStationManager extends Component
     {
         $this->editingUserId = $userId;
         $user = User::findOrFail($userId);
-        
+
         $this->name = $user->name;
         $this->email = $user->email;
         $this->is_admin = $user->is_admin;
@@ -120,13 +129,13 @@ class UserStationManager extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->editingUserId,
+            'email' => 'required|email|unique:users,email,'.$this->editingUserId,
             'password' => 'nullable|string|min:8|confirmed',
             'is_admin' => 'boolean',
         ]);
 
         $user = User::findOrFail($this->editingUserId);
-        
+
         $updateData = [
             'name' => $this->name,
             'email' => $this->email,
@@ -134,7 +143,7 @@ class UserStationManager extends Component
         ];
 
         // Uppdatera lösenord bara om det är angivet
-        if (!empty($this->password)) {
+        if (! empty($this->password)) {
             $updateData['password'] = Hash::make($this->password);
         }
 
@@ -150,15 +159,15 @@ class UserStationManager extends Component
     {
         $user = User::findOrFail($userId);
         $userName = $user->name;
-        
+
         // Ta bort användarens stationstilldelningar
         $user->stations()->detach();
-        
+
         // Ta bort användaren
         $user->delete();
 
         session()->flash('message', "Användare {$userName} har tagits bort.");
-        
+
         // Rensa urval om den borttagna användaren var vald
         if ($this->selectedUserId == $userId) {
             $this->clearSelection();

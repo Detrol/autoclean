@@ -3,9 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\InventoryItem;
+use App\Models\InventoryTransaction;
 use App\Models\Station;
 use App\Models\StationInventory;
-use App\Models\InventoryTransaction;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,36 +15,55 @@ class InventoryManager extends Component
     use WithPagination;
 
     public $selectedTab = 'items';
+
     public $selectedStationId = null;
-    
+
     // Item management
     public $showItemForm = false;
+
     public $editingItemId = null;
+
     public $itemName = '';
+
     public $itemDescription = '';
+
     public $itemUnit = 'pcs';
+
     public $itemReorderLevel = 0;
+
     public $itemActive = true;
-    
+
     // Station inventory management
     public $showStationInventoryForm = false;
+
     public $selectedStationInventory = null;
+
     public $currentQuantity = 0;
+
     public $minimumQuantity = 0;
+
     public $notes = '';
-    
+
     // Bulk item selection
     public $showAddItemsForm = false;
+
     public $selectedItems = [];
+
     public $itemQuantities = [];
-    
+
     // Transaction form
     public $showTransactionForm = false;
+
     public $transactionType = 'adjust';
+
     public $transactionQuantity = 0;
+
     public $transactionReason = '';
+
     public $transactionNotes = '';
+
     public $transactionStationId = null;
+
     public $transactionItemId = null;
 
     public $unitOptions = [
@@ -69,22 +88,22 @@ class InventoryManager extends Component
         })->paginate(20);
 
         $stations = Station::active()->get();
-        
+
         $stationInventory = collect();
         $lowStockItems = collect();
-        
+
         if ($this->selectedStationId && $this->selectedTab !== 'items') {
             $stationInventory = StationInventory::where('station_id', $this->selectedStationId)
                 ->with(['inventoryItem', 'station'])
                 ->get();
-                
+
             $lowStockItems = $stationInventory->where('is_low_stock', true);
         }
 
         $recentTransactions = collect();
         if ($this->selectedTab === 'transactions') {
             $recentTransactions = InventoryTransaction::with(['user', 'station', 'inventoryItem'])
-                ->when($this->selectedStationId, fn($q) => $q->where('station_id', $this->selectedStationId))
+                ->when($this->selectedStationId, fn ($q) => $q->where('station_id', $this->selectedStationId))
                 ->orderBy('created_at', 'desc')
                 ->take(50)
                 ->get();
@@ -114,7 +133,7 @@ class InventoryManager extends Component
     public function openItemForm($itemId = null)
     {
         $this->editingItemId = $itemId;
-        
+
         if ($itemId) {
             $item = InventoryItem::findOrFail($itemId);
             $this->itemName = $item->name;
@@ -125,7 +144,7 @@ class InventoryManager extends Component
         } else {
             $this->resetItemForm();
         }
-        
+
         $this->showItemForm = true;
     }
 
@@ -189,7 +208,7 @@ class InventoryManager extends Component
             $this->minimumQuantity = $this->selectedStationInventory->minimum_quantity;
             $this->notes = $this->selectedStationInventory->notes ?? '';
         }
-        
+
         $this->showStationInventoryForm = true;
     }
 
@@ -203,7 +222,7 @@ class InventoryManager extends Component
         if ($this->selectedStationInventory) {
             $oldQuantity = $this->selectedStationInventory->current_quantity;
             $newQuantity = $this->currentQuantity;
-            
+
             $this->selectedStationInventory->update([
                 'current_quantity' => $newQuantity,
                 'minimum_quantity' => $this->minimumQuantity,
@@ -272,21 +291,22 @@ class InventoryManager extends Component
     {
         if (empty($this->selectedItems)) {
             session()->flash('error', 'Du måste välja minst en artikel.');
+
             return;
         }
 
         $station = Station::findOrFail($this->selectedStationId);
         $created = 0;
-        
+
         foreach ($this->selectedItems as $itemId) {
             $exists = StationInventory::where('station_id', $this->selectedStationId)
                 ->where('inventory_item_id', $itemId)
                 ->exists();
-                
-            if (!$exists) {
+
+            if (! $exists) {
                 $item = InventoryItem::find($itemId);
                 $quantity = $this->itemQuantities[$itemId] ?? 0;
-                
+
                 StationInventory::create([
                     'station_id' => $this->selectedStationId,
                     'inventory_item_id' => $itemId,
@@ -296,7 +316,7 @@ class InventoryManager extends Component
                 $created++;
             }
         }
-        
+
         $this->closeAddItemsForm();
         session()->flash('message', "Lade till {$created} artiklar till {$station->name}");
     }
@@ -306,14 +326,14 @@ class InventoryManager extends Component
     {
         $station = Station::findOrFail($stationId);
         $items = InventoryItem::active()->get();
-        
+
         $created = 0;
         foreach ($items as $item) {
             $exists = StationInventory::where('station_id', $stationId)
                 ->where('inventory_item_id', $item->id)
                 ->exists();
-                
-            if (!$exists) {
+
+            if (! $exists) {
                 StationInventory::create([
                     'station_id' => $stationId,
                     'inventory_item_id' => $item->id,
@@ -323,7 +343,7 @@ class InventoryManager extends Component
                 $created++;
             }
         }
-        
+
         session()->flash('message', "Lade till {$created} artiklar till {$station->name}");
     }
 }

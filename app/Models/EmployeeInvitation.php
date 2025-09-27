@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class EmployeeInvitation extends Model
 {
@@ -67,7 +66,7 @@ class EmployeeInvitation extends Model
      */
     public function isValid(): bool
     {
-        return !$this->hasExpired() && !$this->hasBeenAccepted();
+        return ! $this->hasExpired() && ! $this->hasBeenAccepted();
     }
 
     /**
@@ -92,7 +91,7 @@ class EmployeeInvitation extends Model
     public function scopeValid($query)
     {
         return $query->whereNull('accepted_at')
-                    ->where('expires_at', '>', now());
+            ->where('expires_at', '>', now());
     }
 
     /**
@@ -101,7 +100,7 @@ class EmployeeInvitation extends Model
     public function scopeExpired($query)
     {
         return $query->where('expires_at', '<=', now())
-                    ->whereNull('accepted_at');
+            ->whereNull('accepted_at');
     }
 
     /**

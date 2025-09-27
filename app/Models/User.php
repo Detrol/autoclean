@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'station_order',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'station_order' => 'array',
         ];
     }
 
@@ -86,11 +88,11 @@ class User extends Authenticatable
     public function hasActiveTimeLog($stationId = null)
     {
         $query = $this->timeLogs()->active();
-        
+
         if ($stationId) {
             $query->where('station_id', $stationId);
         }
-        
+
         return $query->exists();
     }
 }

@@ -59,7 +59,7 @@ class InventoryTransaction extends Model
 
     public function getFormattedTypeAttribute(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'add' => 'Tillagt',
             'remove' => 'Förbrukat',
             'adjust' => 'Justerat',
@@ -70,13 +70,13 @@ class InventoryTransaction extends Model
 
     public function getSignedQuantityAttribute(): string
     {
-        $prefix = match($this->type) {
+        $prefix = match ($this->type) {
             'add' => '+',
             'remove' => '-',
             'adjust' => $this->quantity >= 0 ? '+' : '',
             default => '',
         };
-        
-        return $prefix . $this->quantity;
+
+        return $prefix.$this->quantity;
     }
 }

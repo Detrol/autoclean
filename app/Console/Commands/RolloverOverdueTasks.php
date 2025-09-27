@@ -67,7 +67,7 @@ class RolloverOverdueTasks extends Command
         $overdueTasks = TaskSchedule::with('task')
             ->where('status', 'overdue')
             ->whereDate('scheduled_date', '<', now())
-            ->whereHas('task', function($query) {
+            ->whereHas('task', function ($query) {
                 $query->where('interval_type', '!=', 'daily');
             })
             ->get();

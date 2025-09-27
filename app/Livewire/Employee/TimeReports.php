@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Employee;
 
-use App\Models\TimeLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -10,8 +9,11 @@ use Livewire\Component;
 class TimeReports extends Component
 {
     public $periodType = 'week'; // day, week, month, year
+
     public $selectedDate;
+
     public $startDate;
+
     public $endDate;
 
     public function mount()
@@ -46,8 +48,8 @@ class TimeReports extends Component
         }
 
         $timeLogs = $timeLogs->orderBy('date', 'desc')
-                             ->orderBy('clock_in', 'desc')
-                             ->get();
+            ->orderBy('clock_in', 'desc')
+            ->get();
 
         // Beräkna statistik
         $regularLogs = $timeLogs->where('is_oncall', false);
@@ -184,7 +186,8 @@ class TimeReports extends Component
             case 'week':
                 $start = $date->startOfWeek();
                 $end = $date->endOfWeek();
-                return 'Vecka ' . $date->weekOfYear . ' (' . $start->isoFormat('D MMM') . ' - ' . $end->isoFormat('D MMM YYYY') . ')';
+
+                return 'Vecka '.$date->weekOfYear.' ('.$start->isoFormat('D MMM').' - '.$end->isoFormat('D MMM YYYY').')';
             case 'month':
                 return $date->isoFormat('MMMM YYYY');
             case 'year':

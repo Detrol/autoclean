@@ -9,30 +9,34 @@ use App\Models\Task;
 use App\Models\TaskSchedule;
 use App\Models\TaskTemplate;
 use App\Models\TimeLog;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class StationDetails extends Component
 {
     public Station $station;
+
     public $taskComments = [];
+
     public $showCommentForm = [];
-    
+
     // Additional task properties
     public $showAdditionalTaskForm = false;
+
     public $selectedTemplateId = null;
+
     public $customTaskName = '';
+
     public $additionalTaskNotes = '';
 
     public function mount($id)
     {
         $user = Auth::user();
-        
+
         // Hämta station och kontrollera att användaren har åtkomst
         $this->station = Station::findOrFail($id);
-        
-        if (!$user->stations->contains($this->station)) {
+
+        if (! $user->stations->contains($this->station)) {
             abort(403, 'Du har inte åtkomst till denna station.');
         }
     }
@@ -40,11 +44,11 @@ class StationDetails extends Component
     public function render()
     {
         $user = Auth::user();
-        
+
         // Hämta alla uppgifter för stationen
         $tasks = Task::where('station_id', $this->station->id)
             ->where('is_active', true)
-            ->with(['schedules' => function($query) {
+            ->with(['schedules' => function ($query) {
                 $query->orderBy('scheduled_date', 'desc');
             }])
             ->get();
@@ -87,7 +91,7 @@ class StationDetails extends Component
 
         // Kontrollera om användaren är inklockat
         $isLoggedIn = $user->hasActiveTimeLog($this->station->id);
-        
+
         // Hämta senaste tidslogs
         $recentTimeLogs = TimeLog::where('station_id', $this->station->id)
             ->whereNotNull('clock_out')
@@ -134,9 +138,10 @@ class StationDetails extends Component
     public function clockIn()
     {
         $user = Auth::user();
-        
+
         if ($user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du är redan inklockat på denna station.');
+
             return;
         }
 
@@ -154,15 +159,16 @@ class StationDetails extends Component
     {
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
         $user = Auth::user();
-        
+
         // Kontrollera att användaren är inklockat på denna station (gäller inte admins)
-        if (!$user->is_admin && !$user->hasActiveTimeLog($this->station->id)) {
+        if (! $user->is_admin && ! $user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att markera uppgifter som slutförda.');
+
             return;
         }
 
         $taskSchedule->markAsCompleted(Auth::id());
-        
+
         session()->flash('message', 'Uppgift markerad som slutförd!');
     }
 
@@ -170,16 +176,18 @@ class StationDetails extends Component
     {
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
         $user = Auth::user();
-        
+
         // Kontrollera att användaren är inklockat på denna station (gäller inte admins)
-        if (!$user->is_admin && !$user->hasActiveTimeLog($this->station->id)) {
+        if (! $user->is_admin && ! $user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att avmarkera uppgifter.');
+
             return;
         }
 
         // Kontrollera att det är användaren som slutförde uppgiften (admins kan avmarkera alla)
-        if (!$user->is_admin && $taskSchedule->completed_by !== Auth::id()) {
+        if (! $user->is_admin && $taskSchedule->completed_by !== Auth::id()) {
             session()->flash('error', 'Du kan bara avmarkera uppgifter som du själv har slutfört.');
+
             return;
         }
 
@@ -187,7 +195,7 @@ class StationDetails extends Component
         $taskSchedule->completed_at = null;
         $taskSchedule->completed_by = null;
         $taskSchedule->save();
-        
+
         session()->flash('message', 'Uppgift avmarkerad!');
     }
 
@@ -195,16 +203,16 @@ class StationDetails extends Component
     {
         switch ($task->interval_type) {
             case 'daily':
-                return $task->interval_value == 1 
-                    ? 'Dagligen' 
+                return $task->interval_value == 1
+                    ? 'Dagligen'
                     : "Varje {$task->interval_value} dagar";
             case 'weekly':
-                return $task->interval_value == 1 
-                    ? 'Varje vecka' 
+                return $task->interval_value == 1
+                    ? 'Varje vecka'
                     : "Varje {$task->interval_value} veckor";
             case 'monthly':
-                return $task->interval_value == 1 
-                    ? 'Varje månad' 
+                return $task->interval_value == 1
+                    ? 'Varje månad'
                     : "Varje {$task->interval_value} månader";
             case 'custom':
                 return "Varje {$task->interval_value} dagar (anpassat)";
@@ -215,10 +223,10 @@ class StationDetails extends Component
 
     public function toggleCommentForm($taskScheduleId)
     {
-        $this->showCommentForm[$taskScheduleId] = !($this->showCommentForm[$taskScheduleId] ?? false);
-        
+        $this->showCommentForm[$taskScheduleId] = ! ($this->showCommentForm[$taskScheduleId] ?? false);
+
         // Load existing comment if not already loaded
-        if (!isset($this->taskComments[$taskScheduleId])) {
+        if (! isset($this->taskComments[$taskScheduleId])) {
             $taskSchedule = TaskSchedule::find($taskScheduleId);
             $this->taskComments[$taskScheduleId] = $taskSchedule->notes ?? '';
         }
@@ -228,17 +236,18 @@ class StationDetails extends Component
     {
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
         $user = Auth::user();
-        
+
         // Kontrollera att användaren har tillgång till stationen (admins har alltid tillgång)
-        if (!$user->is_admin && !$user->stations->contains($this->station)) {
+        if (! $user->is_admin && ! $user->stations->contains($this->station)) {
             session()->flash('error', 'Du har inte behörighet att kommentera denna uppgift.');
+
             return;
         }
-        
+
         $taskSchedule->update([
-            'notes' => $this->taskComments[$taskScheduleId] ?? null
+            'notes' => $this->taskComments[$taskScheduleId] ?? null,
         ]);
-        
+
         $this->showCommentForm[$taskScheduleId] = false;
         session()->flash('message', 'Kommentar sparad!');
     }
@@ -254,10 +263,11 @@ class StationDetails extends Component
     public function showAddAdditionalTaskForm()
     {
         $user = Auth::user();
-        
+
         // Kontrollera att användaren är inklockat
-        if (!$user->is_admin && !$user->hasActiveTimeLog($this->station->id)) {
+        if (! $user->is_admin && ! $user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att lägga till extra uppgifter.');
+
             return;
         }
 
@@ -278,10 +288,11 @@ class StationDetails extends Component
     public function saveAdditionalTask()
     {
         $user = Auth::user();
-        
+
         // Kontrollera att användaren är inklockat
-        if (!$user->is_admin && !$user->hasActiveTimeLog($this->station->id)) {
+        if (! $user->is_admin && ! $user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att lägga till extra uppgifter.');
+
             return;
         }
 
@@ -297,6 +308,7 @@ class StationDetails extends Component
         // Validera att vi har ett task name
         if (empty($taskName)) {
             session()->flash('error', 'Du måste välja en mall eller ange ett anpassat namn för uppgiften.');
+
             return;
         }
 

@@ -11,9 +11,13 @@ class StationManager extends Component
     use WithPagination;
 
     public $name = '';
+
     public $description = '';
+
     public $is_active = true;
+
     public $editingStationId = null;
+
     public $showCreateForm = false;
 
     protected $rules = [
@@ -25,7 +29,7 @@ class StationManager extends Component
     public function render()
     {
         return view('livewire.admin.station-manager', [
-            'stations' => Station::paginate(10)
+            'stations' => Station::paginate(10),
         ]);
     }
 
@@ -49,7 +53,7 @@ class StationManager extends Component
     public function edit($stationId)
     {
         $station = Station::findOrFail($stationId);
-        
+
         $this->editingStationId = $stationId;
         $this->name = $station->name;
         $this->description = $station->description;
@@ -61,7 +65,7 @@ class StationManager extends Component
         $this->validate();
 
         $station = Station::findOrFail($this->editingStationId);
-        
+
         $station->update([
             'name' => $this->name,
             'description' => $this->description,
@@ -77,15 +81,16 @@ class StationManager extends Component
     public function delete($stationId)
     {
         $station = Station::findOrFail($stationId);
-        
+
         // Kontrollera om stationen har aktiva uppgifter eller tidslogs
         if ($station->tasks()->active()->exists()) {
             session()->flash('error', 'Kan inte ta bort station som har aktiva uppgifter.');
+
             return;
         }
 
         $station->delete();
-        
+
         session()->flash('message', 'Station borttagen framgångsrikt!');
     }
 
@@ -97,8 +102,8 @@ class StationManager extends Component
 
     public function toggleCreateForm()
     {
-        $this->showCreateForm = !$this->showCreateForm;
-        if (!$this->showCreateForm) {
+        $this->showCreateForm = ! $this->showCreateForm;
+        if (! $this->showCreateForm) {
             $this->reset(['name', 'description']);
             $this->is_active = true;
         }

@@ -13,12 +13,16 @@ class TaskTemplates extends Component
     use WithPagination;
 
     public $showCreateForm = false;
+
     public $showEditForm = false;
+
     public $editingTemplateId = null;
 
     // Form properties
     public $name = '';
+
     public $description = '';
+
     public $is_active = true;
 
     // Filters
@@ -33,7 +37,7 @@ class TaskTemplates extends Component
     public function mount()
     {
         $user = Auth::user();
-        if (!$user->is_admin) {
+        if (! $user->is_admin) {
             abort(403, 'Endast administratörer har tillgång till denna sida.');
         }
     }
@@ -44,23 +48,21 @@ class TaskTemplates extends Component
 
         // Apply filters
         if ($this->searchTerm) {
-            $query->where(function($q) {
-                $q->where('name', 'like', '%' . $this->searchTerm . '%')
-                  ->orWhere('description', 'like', '%' . $this->searchTerm . '%');
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%'.$this->searchTerm.'%')
+                    ->orWhere('description', 'like', '%'.$this->searchTerm.'%');
             });
         }
 
-
         $templates = $query->orderBy('name')
-                          ->paginate(10);
-
+            ->paginate(10);
 
         // Get usage statistics
         $templateUsage = CompletedAdditionalTask::selectRaw('task_template_id, COUNT(*) as usage_count')
-                                              ->whereNotNull('task_template_id')
-                                              ->groupBy('task_template_id')
-                                              ->pluck('usage_count', 'task_template_id')
-                                              ->toArray();
+            ->whereNotNull('task_template_id')
+            ->groupBy('task_template_id')
+            ->pluck('usage_count', 'task_template_id')
+            ->toArray();
 
         return view('livewire.admin.task-templates', [
             'templates' => $templates,
@@ -83,12 +85,12 @@ class TaskTemplates extends Component
     public function openEditForm($templateId)
     {
         $template = TaskTemplate::findOrFail($templateId);
-        
+
         $this->editingTemplateId = $templateId;
         $this->name = $template->name;
         $this->description = $template->description;
         $this->is_active = $template->is_active;
-        
+
         $this->showEditForm = true;
     }
 
@@ -105,6 +107,7 @@ class TaskTemplates extends Component
         // Check for duplicate names
         if (TaskTemplate::where('name', $this->name)->exists()) {
             session()->flash('error', 'En mall med detta namn finns redan.');
+
             return;
         }
 
@@ -126,9 +129,10 @@ class TaskTemplates extends Component
 
         // Check for duplicate names (excluding current template)
         if (TaskTemplate::where('name', $this->name)
-                       ->where('id', '!=', $this->editingTemplateId)
-                       ->exists()) {
+            ->where('id', '!=', $this->editingTemplateId)
+            ->exists()) {
             session()->flash('error', 'En mall med detta namn finns redan.');
+
             return;
         }
 
@@ -145,8 +149,8 @@ class TaskTemplates extends Component
     public function toggleActive($templateId)
     {
         $template = TaskTemplate::findOrFail($templateId);
-        $template->update(['is_active' => !$template->is_active]);
-        
+        $template->update(['is_active' => ! $template->is_active]);
+
         $status = $template->is_active ? 'aktiverad' : 'inaktiverad';
         session()->flash('message', "Mall {$status}!");
     }
@@ -154,12 +158,13 @@ class TaskTemplates extends Component
     public function deleteTemplate($templateId)
     {
         $template = TaskTemplate::findOrFail($templateId);
-        
+
         // Check if template is being used
         $usageCount = CompletedAdditionalTask::where('task_template_id', $templateId)->count();
-        
+
         if ($usageCount > 0) {
             session()->flash('error', "Kan inte ta bort mallen eftersom den har använts {$usageCount} gånger. Inaktivera den istället.");
+
             return;
         }
 
@@ -171,7 +176,6 @@ class TaskTemplates extends Component
     {
         $this->resetPage();
     }
-
 
     private function resetForm()
     {

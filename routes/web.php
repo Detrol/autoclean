@@ -6,6 +6,7 @@ use App\Livewire\Admin\TaskManager;
 use App\Livewire\Admin\TaskTemplates;
 use App\Livewire\Admin\UserStationManager;
 use App\Livewire\Employee\StationDetails;
+use App\Livewire\Employee\StationTasks;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -15,6 +16,7 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
     }
+
     return redirect()->route('login');
 })->name('home');
 
@@ -31,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Employee routes
     Route::get('station/{id}', StationDetails::class)->name('station.details');
+    Route::get('station/{id}/tasks', StationTasks::class)->name('station.tasks');
     Route::get('time-reports', \App\Livewire\Employee\TimeReports::class)->name('time-reports');
 
     // Admin routes

@@ -16,7 +16,7 @@ class TaskSeeder extends Seeder
         $hammaroStation = Station::where('name', 'Hammarö')->first();
         $vaxnasStation = Station::where('name', 'Våxnäs')->first();
 
-        if (!$hammaroStation || !$vaxnasStation) {
+        if (! $hammaroStation || ! $vaxnasStation) {
             throw new \Exception('Stationer måste finnas innan uppgifter kan skapas. Kör StationSeeder först.');
         }
 
@@ -24,7 +24,7 @@ class TaskSeeder extends Seeder
         // DAGLIG BASRUTIN (GUL) - 1 timme
         // Utförs VARJE besök på båda stationerna
         // ==========================================
-        
+
         $dailyBaseTasks = [
             [
                 'name' => 'Kontrollera och töm soptunnor',
@@ -84,7 +84,7 @@ class TaskSeeder extends Seeder
                 Task::firstOrCreate(
                     [
                         'station_id' => $taskData['station_id'],
-                        'name' => $taskData['name']
+                        'name' => $taskData['name'],
                     ],
                     $taskData
                 );
@@ -103,7 +103,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['monday']
+                    'daysOfWeek' => ['monday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -114,7 +114,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['monday']
+                    'daysOfWeek' => ['monday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -125,7 +125,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['monday']
+                    'daysOfWeek' => ['monday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -138,7 +138,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['wednesday']
+                    'daysOfWeek' => ['wednesday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -149,7 +149,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['wednesday']
+                    'daysOfWeek' => ['wednesday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -160,7 +160,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['wednesday']
+                    'daysOfWeek' => ['wednesday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -171,7 +171,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['wednesday']
+                    'daysOfWeek' => ['wednesday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -185,7 +185,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday'],
-                    'weekType' => 'odd'
+                    'weekType' => 'odd',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -197,7 +197,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday'],
-                    'weekType' => 'odd'
+                    'weekType' => 'odd',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -209,7 +209,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday'],
-                    'weekType' => 'odd'
+                    'weekType' => 'odd',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -221,7 +221,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['wednesday'],
-                    'weekType' => 'odd'
+                    'weekType' => 'odd',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -235,7 +235,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['friday'],
-                    'weekType' => 'even'
+                    'weekType' => 'even',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -247,7 +247,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['friday'],
-                    'weekType' => 'even'
+                    'weekType' => 'even',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -259,7 +259,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['friday'],
-                    'weekType' => 'even'
+                    'weekType' => 'even',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -271,7 +271,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['friday'],
-                    'weekType' => 'even'
+                    'weekType' => 'even',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -284,7 +284,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['saturday']
+                    'daysOfWeek' => ['saturday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -295,7 +295,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['saturday']
+                    'daysOfWeek' => ['saturday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -309,7 +309,7 @@ class TaskSeeder extends Seeder
                 'interval_value' => 2,
                 'recurrence_pattern' => [
                     'daysOfWeek' => ['friday'],
-                    'weekType' => 'odd'
+                    'weekType' => 'odd',
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -321,7 +321,7 @@ class TaskSeeder extends Seeder
             Task::firstOrCreate(
                 [
                     'station_id' => $taskData['station_id'],
-                    'name' => $taskData['name']
+                    'name' => $taskData['name'],
                 ],
                 $taskData
             );
@@ -339,7 +339,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['monday', 'friday']
+                    'daysOfWeek' => ['monday', 'friday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -352,7 +352,7 @@ class TaskSeeder extends Seeder
                 'interval_type' => 'weekly',
                 'interval_value' => 1,
                 'recurrence_pattern' => [
-                    'daysOfWeek' => ['friday']
+                    'daysOfWeek' => ['friday'],
                 ],
                 'default_due_time' => '23:59',
                 'is_active' => true,
@@ -364,7 +364,7 @@ class TaskSeeder extends Seeder
             Task::firstOrCreate(
                 [
                     'station_id' => $taskData['station_id'],
-                    'name' => $taskData['name']
+                    'name' => $taskData['name'],
                 ],
                 $taskData
             );

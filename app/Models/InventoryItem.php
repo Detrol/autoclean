@@ -40,7 +40,7 @@ class InventoryItem extends Model
 
     public function getFormattedUnitAttribute(): string
     {
-        return match($this->unit) {
+        return match ($this->unit) {
             'pcs' => 'st',
             'liters' => 'l',
             'meters' => 'm',

@@ -75,22 +75,25 @@ class Task extends Model
     public function getIntervalDescription(): string
     {
         $pattern = $this->recurrence_pattern;
-        
+
         switch ($this->interval_type) {
             case 'daily':
                 if ($pattern && isset($pattern['weekdaysOnly']) && $pattern['weekdaysOnly']) {
                     return 'Vardagar';
                 }
+
                 return $this->interval_value == 1 ? 'Dagligen' : "Varje {$this->interval_value} dagar";
-                
+
             case 'weekly':
-                $interval = $this->interval_value == 1 ? '' : "varannan " . ($this->interval_value == 2 ? '' : "var {$this->interval_value}:e ");
+                $interval = $this->interval_value == 1 ? '' : 'varannan '.($this->interval_value == 2 ? '' : "var {$this->interval_value}:e ");
                 if ($pattern && isset($pattern['daysOfWeek'])) {
                     $days = $this->formatWeekdays($pattern['daysOfWeek']);
+
                     return "Varje {$interval}vecka på {$days}";
                 }
+
                 return "Varje {$interval}vecka";
-                
+
             case 'monthly':
                 $interval = $this->interval_value == 1 ? '' : "var {$this->interval_value}:e ";
                 if ($pattern && isset($pattern['dayOfMonth'])) {
@@ -99,16 +102,18 @@ class Task extends Model
                 if ($pattern && isset($pattern['weekdayOfMonth'])) {
                     $ordinal = ['första', 'andra', 'tredje', 'fjärde', 'sista'][$pattern['weekdayOfMonth']['ordinal'] - 1] ?? '';
                     $day = $pattern['weekdayOfMonth']['day'];
+
                     return "{$ordinal} {$day}en {$interval}månad";
                 }
-                return "Månadsvis";
-                
+
+                return 'Månadsvis';
+
             case 'yearly':
                 return 'Årligen';
-                
+
             case 'custom':
                 return 'Anpassat schema';
-                
+
             default:
                 return 'Okänt intervall';
         }
@@ -121,21 +126,22 @@ class Task extends Model
     {
         $dayNames = [
             'monday' => 'måndag',
-            'tuesday' => 'tisdag', 
+            'tuesday' => 'tisdag',
             'wednesday' => 'onsdag',
             'thursday' => 'torsdag',
             'friday' => 'fredag',
             'saturday' => 'lördag',
-            'sunday' => 'söndag'
+            'sunday' => 'söndag',
         ];
-        
-        $translatedDays = array_map(fn($day) => $dayNames[$day] ?? $day, $days);
-        
+
+        $translatedDays = array_map(fn ($day) => $dayNames[$day] ?? $day, $days);
+
         if (count($translatedDays) > 1) {
             $last = array_pop($translatedDays);
-            return implode(', ', $translatedDays) . ' och ' . $last;
+
+            return implode(', ', $translatedDays).' och '.$last;
         }
-        
+
         return $translatedDays[0] ?? '';
     }
 }

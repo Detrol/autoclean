@@ -58,7 +58,7 @@ class TimeLog extends Model
         $clockOut = now();
         // Beräkna minuter från clock_in till clock_out
         $clockIn = $this->clock_in;
-        
+
         // Säkerställ att vi alltid får positiva minuter
         if ($clockOut->greaterThan($clockIn)) {
             $totalMinutes = $clockIn->diffInMinutes($clockOut);
@@ -78,7 +78,7 @@ class TimeLog extends Model
 
     public function getTotalHoursAttribute()
     {
-        if (!$this->total_minutes) {
+        if (! $this->total_minutes) {
             return 0;
         }
 
@@ -104,7 +104,7 @@ class TimeLog extends Model
         $year = \Carbon\Carbon::parse($date)->year;
 
         return $query->whereMonth('date', $month)
-                     ->whereYear('date', $year);
+            ->whereYear('date', $year);
     }
 
     public function scopeForYear($query, $date)

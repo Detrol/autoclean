@@ -13,27 +13,44 @@ class TaskManager extends Component
     use WithPagination;
 
     public $station_id = '';
+
     public $name = '';
+
     public $description = '';
+
     public $interval_type = 'daily';
+
     public $interval_value = 1;
+
     public $start_date = '';
+
     public $end_date = '';
+
     public $occurrences = null;
+
     public $is_active = true;
+
     public $editingTaskId = null;
+
     public $showCreateForm = false;
+
     public $selectedStationFilter = '';
-    
+
     // Intervallspecifika fält
     public $weekdays_only = false;
+
     public $selected_weekdays = [];
+
     public $monthly_type = 'date'; // 'date' eller 'weekday'
+
     public $monthly_date = 1;
+
     public $monthly_weekday_ordinal = 1; // 1-5
+
     public $monthly_weekday = 'monday';
+
     public $end_type = 'never'; // 'never', 'date', 'occurrences'
-    
+
     // För förhandsvisning
     public $preview_dates = [];
 
@@ -52,7 +69,7 @@ class TaskManager extends Component
     public function render()
     {
         $query = Task::with('station');
-        
+
         if ($this->selectedStationFilter) {
             $query->where('station_id', $this->selectedStationFilter);
         }
@@ -90,7 +107,7 @@ class TaskManager extends Component
     public function edit($taskId)
     {
         $task = Task::findOrFail($taskId);
-        
+
         $this->editingTaskId = $taskId;
         $this->station_id = $task->station_id;
         $this->name = $task->name;
@@ -101,7 +118,7 @@ class TaskManager extends Component
         $this->end_date = $task->end_date ? $task->end_date->format('Y-m-d') : '';
         $this->occurrences = $task->occurrences;
         $this->is_active = $task->is_active;
-        
+
         // Sätt end_type baserat på befintliga värden
         if ($task->end_date) {
             $this->end_type = 'date';
@@ -110,7 +127,7 @@ class TaskManager extends Component
         } else {
             $this->end_type = 'never';
         }
-        
+
         // Ladda återkommande mönster
         $this->loadRecurrencePattern($task->recurrence_pattern);
     }
@@ -120,7 +137,7 @@ class TaskManager extends Component
         $this->validate();
 
         $task = Task::findOrFail($this->editingTaskId);
-        
+
         $task->update([
             'station_id' => $this->station_id,
             'name' => $this->name,
@@ -143,15 +160,16 @@ class TaskManager extends Component
     public function delete($taskId)
     {
         $task = Task::findOrFail($taskId);
-        
+
         // Kontrollera om uppgiften har schemalagda instanser
         if ($task->schedules()->exists()) {
             session()->flash('error', 'Kan inte ta bort uppgift som har schemalagda instanser.');
+
             return;
         }
 
         $task->delete();
-        
+
         session()->flash('message', 'Uppgift borttagen framgångsrikt!');
     }
 
@@ -162,8 +180,8 @@ class TaskManager extends Component
 
     public function toggleCreateForm()
     {
-        $this->showCreateForm = !$this->showCreateForm;
-        if (!$this->showCreateForm) {
+        $this->showCreateForm = ! $this->showCreateForm;
+        if (! $this->showCreateForm) {
             $this->resetForm();
         }
     }
@@ -176,10 +194,10 @@ class TaskManager extends Component
     private function resetForm()
     {
         $this->reset([
-            'station_id', 'name', 'description', 'interval_type', 'interval_value', 
+            'station_id', 'name', 'description', 'interval_type', 'interval_value',
             'start_date', 'end_date', 'occurrences', 'editingTaskId',
             'weekdays_only', 'selected_weekdays', 'monthly_type', 'monthly_date',
-            'monthly_weekday_ordinal', 'monthly_weekday', 'end_type', 'preview_dates'
+            'monthly_weekday_ordinal', 'monthly_weekday', 'end_type', 'preview_dates',
         ]);
         $this->is_active = true;
         $this->interval_type = 'daily';
@@ -189,7 +207,7 @@ class TaskManager extends Component
         $this->monthly_weekday = 'monday';
         $this->end_type = 'never';
     }
-    
+
     /**
      * Bygg återkommande mönster baserat på formulärdata
      */
@@ -200,14 +218,16 @@ class TaskManager extends Component
                 if ($this->weekdays_only) {
                     return ['weekdaysOnly' => true];
                 }
+
                 return null;
-                
+
             case 'weekly':
-                if (!empty($this->selected_weekdays)) {
+                if (! empty($this->selected_weekdays)) {
                     return ['daysOfWeek' => $this->selected_weekdays];
                 }
+
                 return null;
-                
+
             case 'monthly':
                 if ($this->monthly_type === 'date') {
                     return ['dayOfMonth' => $this->monthly_date];
@@ -215,41 +235,41 @@ class TaskManager extends Component
                     return [
                         'weekdayOfMonth' => [
                             'ordinal' => $this->monthly_weekday_ordinal,
-                            'day' => $this->monthly_weekday
-                        ]
+                            'day' => $this->monthly_weekday,
+                        ],
                     ];
                 }
-                
+
             case 'yearly':
                 return null; // Använder startdatum
-                
+
             case 'custom':
                 // För framtida utökning
                 return null;
-                
+
             default:
                 return null;
         }
     }
-    
+
     /**
      * Ladda återkommande mönster till formulärfält
      */
     private function loadRecurrencePattern(?array $pattern): void
     {
-        if (!$pattern) {
+        if (! $pattern) {
             return;
         }
-        
+
         switch ($this->interval_type) {
             case 'daily':
                 $this->weekdays_only = $pattern['weekdaysOnly'] ?? false;
                 break;
-                
+
             case 'weekly':
                 $this->selected_weekdays = $pattern['daysOfWeek'] ?? [];
                 break;
-                
+
             case 'monthly':
                 if (isset($pattern['dayOfMonth'])) {
                     $this->monthly_type = 'date';
@@ -262,7 +282,7 @@ class TaskManager extends Component
                 break;
         }
     }
-    
+
     /**
      * Uppdatera förhandsvisning när intervalldata ändras
      */
@@ -270,51 +290,51 @@ class TaskManager extends Component
     {
         $this->updatePreview();
     }
-    
+
     public function updatedIntervalValue()
     {
         $this->updatePreview();
     }
-    
+
     public function updatedStartDate()
     {
         $this->updatePreview();
     }
-    
+
     public function updatedSelectedWeekdays()
     {
         $this->updatePreview();
     }
-    
+
     public function updatedMonthlyType()
     {
         $this->updatePreview();
     }
-    
+
     public function updatedMonthlyDate()
     {
         $this->updatePreview();
     }
-    
+
     public function updatedWeekdaysOnly()
     {
         $this->updatePreview();
     }
-    
+
     /**
      * Uppdatera förhandsvisning av nästa datum
      */
     private function updatePreview()
     {
         // Skapa temporär task för förhandsvisning
-        $tempTask = new Task();
+        $tempTask = new Task;
         $tempTask->interval_type = $this->interval_type;
         $tempTask->interval_value = $this->interval_value;
         $tempTask->start_date = $this->start_date ? \Carbon\Carbon::parse($this->start_date) : null;
         $tempTask->recurrence_pattern = $this->buildRecurrencePattern();
-        
+
         if ($tempTask->start_date) {
-            $calculator = new RecurrenceCalculator();
+            $calculator = new RecurrenceCalculator;
             $this->preview_dates = $calculator->getNextOccurrences($tempTask, 5);
         } else {
             $this->preview_dates = [];

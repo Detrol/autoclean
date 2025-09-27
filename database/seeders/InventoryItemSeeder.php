@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\InventoryItem;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class InventoryItemSeeder extends Seeder
@@ -25,15 +24,15 @@ class InventoryItemSeeder extends Seeder
             ['name' => 'Toalettpapper', 'description' => 'Toalettpapper', 'unit' => 'pcs', 'default_reorder_level' => 20],
             ['name' => 'Handpapper', 'description' => 'Pappershanddukar', 'unit' => 'pcs', 'default_reorder_level' => 10],
             ['name' => 'Tvål', 'description' => 'Flytande handtvål', 'unit' => 'liters', 'default_reorder_level' => 3],
-            
+
             // Skyddsutrustning
             ['name' => 'Handskar', 'description' => 'Rengöringshandskar', 'unit' => 'pcs', 'default_reorder_level' => 10],
             ['name' => 'Förkläde', 'description' => 'Skyddsförkläde', 'unit' => 'pcs', 'default_reorder_level' => 5],
-            
+
             // Sophantering
             ['name' => 'Soppåsar', 'description' => 'Soppåsar för allmänt avfall', 'unit' => 'pcs', 'default_reorder_level' => 50],
             ['name' => 'Återvinningspåsar', 'description' => 'Påsar för återvinning', 'unit' => 'pcs', 'default_reorder_level' => 20],
-            
+
             // Verktyg och utrustning
             ['name' => 'Moppar', 'description' => 'Moppar för golvtorkning', 'unit' => 'pcs', 'default_reorder_level' => 3],
             ['name' => 'Mopptrasa', 'description' => 'Ersättningstrasa för mopp', 'unit' => 'pcs', 'default_reorder_level' => 5],
@@ -41,7 +40,7 @@ class InventoryItemSeeder extends Seeder
             ['name' => 'Skrapa', 'description' => 'Isckrapa för vinterunderhåll', 'unit' => 'pcs', 'default_reorder_level' => 2],
             ['name' => 'Snöskyfffel', 'description' => 'Skyfffel för snöröjning', 'unit' => 'pcs', 'default_reorder_level' => 2],
             ['name' => 'Dammsugarpåsar', 'description' => 'Påsar för dammsugare', 'unit' => 'pcs', 'default_reorder_level' => 10],
-            
+
             // Specialartiklar
             ['name' => 'Väggsalt', 'description' => 'Salt för vintervägar', 'unit' => 'kg', 'default_reorder_level' => 100],
             ['name' => 'Sprayflaska', 'description' => 'Sprayflaska för rengöringsmedel', 'unit' => 'pcs', 'default_reorder_level' => 3],

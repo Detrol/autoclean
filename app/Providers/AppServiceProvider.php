@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin', function ($user) {
             return $user->isAdmin();
         });
-        
+
         // Sätt svenska för datum
         Carbon::setLocale('sv');
     }

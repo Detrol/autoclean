@@ -30,13 +30,13 @@ class GenerateTaskSchedules extends Command
     public function handle()
     {
         $days = (int) $this->option('days');
-        
+
         // Använd custom date eller default till idag (nu när rollover är separat)
         $startDateInput = $this->option('date');
-        $startDate = $startDateInput ? 
-            \Carbon\Carbon::parse($startDateInput)->startOfDay() : 
+        $startDate = $startDateInput ?
+            \Carbon\Carbon::parse($startDateInput)->startOfDay() :
             now()->startOfDay();
-        
+
         $endDate = $startDate->copy()->addDays($days)->endOfDay();
 
         $this->info("Generating task schedules from {$startDate->format('Y-m-d')} to {$endDate->format('Y-m-d')}");
@@ -50,7 +50,7 @@ class GenerateTaskSchedules extends Command
         }
 
         $this->info("Generated {$generatedCount} task schedules successfully!");
-        
+
         return 0;
     }
 
@@ -109,5 +109,4 @@ class GenerateTaskSchedules extends Command
                 return '17:00:00';
         }
     }
-
 }

@@ -15,6 +15,7 @@ use Livewire\Component;
 class SetPassword extends Component
 {
     public ?EmployeeInvitation $invitation = null;
+
     public string $token = '';
 
     #[Validate('required|string|min:8|confirmed')]
@@ -31,9 +32,10 @@ class SetPassword extends Component
         $this->invitation = EmployeeInvitation::where('token', $token)->first();
 
         // Check if invitation is valid
-        if (!$this->invitation) {
+        if (! $this->invitation) {
             session()->flash('error', 'Ogiltig inbjudningslänk.');
             $this->redirect(route('login'), navigate: true);
+
             return;
         }
 
@@ -41,6 +43,7 @@ class SetPassword extends Component
         if ($this->invitation->hasExpired()) {
             session()->flash('error', 'Denna inbjudan har utgått. Kontakta din administratör för en ny inbjudan.');
             $this->redirect(route('login'), navigate: true);
+
             return;
         }
 
@@ -48,6 +51,7 @@ class SetPassword extends Component
         if ($this->invitation->hasBeenAccepted()) {
             session()->flash('error', 'Denna inbjudan har redan använts.');
             $this->redirect(route('login'), navigate: true);
+
             return;
         }
     }
