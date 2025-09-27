@@ -251,19 +251,19 @@
     </div>
 
     <div class="card-modern-elevated p-6 bg-white dark:bg-gray-800">
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl gradient-purple shadow-lg shadow-purple-500/25 flex items-center justify-center">
-                    <x-heroicon-o-plus class="w-5 h-5 text-white" />
-                </div>
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Extra uppgifter</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Lägg till extra utförda uppgifter</p>
-                </div>
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl gradient-purple shadow-lg shadow-purple-500/25 flex items-center justify-center">
+                <x-heroicon-o-plus class="w-5 h-5 text-white" />
             </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Extra uppgifter</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Lägg till extra utförda uppgifter</p>
+            </div>
+        </div>
 
-            @if($isLoggedIn || auth()->user()->is_admin)
-                @if(!$showAdditionalTaskForm)
+        @if($isLoggedIn || auth()->user()->is_admin)
+            @if(!$showAdditionalTaskForm)
+                <div class="mb-6">
                     <flux:button
                         wire:click="showAddAdditionalTaskForm"
                         variant="primary"
@@ -273,11 +273,13 @@
                     >
                         Lägg till extra uppgift
                     </flux:button>
-                @endif
-            @else
-                <span class="text-xs text-gray-500 dark:text-gray-400">Klocka in för att lägga till extra uppgifter</span>
+                </div>
             @endif
-        </div>
+        @else
+            <div class="mb-6">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Klocka in för att lägga till extra uppgifter</span>
+            </div>
+        @endif
 
         @if($showAdditionalTaskForm)
             <div class="card-modern p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700 mb-4">
