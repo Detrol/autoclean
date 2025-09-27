@@ -153,8 +153,8 @@
                         {{ $taskSchedule->status === 'completed' ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-700' :
                            ($taskSchedule->status === 'overdue' ? 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-700' :
                             'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700') }}">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
+                        <div>
+                            <div class="flex items-center gap-3 mb-3">
                                 @if($taskSchedule->status === 'completed')
                                     <button
                                         wire:click="uncompleteTask({{ $taskSchedule->id }})"
@@ -172,33 +172,34 @@
                                     />
                                 @endif
 
-                                <div>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100 {{ $taskSchedule->status === 'completed' ? 'line-through' : '' }}">
-                                        {{ $taskSchedule->task->name }}
-                                    </span>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                        @if($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
-                                            <span>Slutförd av {{ $taskSchedule->completedBy->name }}</span>
-                                        @endif
-                                    </div>
-                                </div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 {{ $taskSchedule->status === 'completed' ? 'line-through' : '' }}">
+                                    {{ $taskSchedule->task->name }}
+                                </span>
                             </div>
 
-                            <div class="flex items-center gap-2">
-                                <button
-                                    wire:click="toggleCommentForm({{ $taskSchedule->id }})"
-                                    class="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-                                    title="Lägg till kommentar"
-                                >
-                                    <x-heroicon-o-chat-bubble-left-ellipsis class="w-4 h-4" />
-                                </button>
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs text-gray-600 dark:text-gray-400">
+                                    @if($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
+                                        <span>Slutförd av {{ $taskSchedule->completedBy->name }}</span>
+                                    @endif
+                                </div>
 
-                                <div class="status-badge
-                                    {{ $taskSchedule->status === 'completed' ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' :
-                                       ($taskSchedule->status === 'overdue' ? 'bg-danger-100 text-danger-800 dark:bg-danger-800 dark:text-danger-200' :
-                                        'bg-warning-100 text-warning-800 dark:bg-warning-800 dark:text-warning-200') }}">
-                                    {{ $taskSchedule->status === 'completed' ? 'Klar' :
-                                       ($taskSchedule->status === 'overdue' ? 'Försenad' : 'Väntande') }}
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        wire:click="toggleCommentForm({{ $taskSchedule->id }})"
+                                        class="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                                        title="Lägg till kommentar"
+                                    >
+                                        <x-heroicon-o-chat-bubble-left-ellipsis class="w-4 h-4" />
+                                    </button>
+
+                                    <div class="status-badge
+                                        {{ $taskSchedule->status === 'completed' ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' :
+                                           ($taskSchedule->status === 'overdue' ? 'bg-danger-100 text-danger-800 dark:bg-danger-800 dark:text-danger-200' :
+                                            'bg-warning-100 text-warning-800 dark:bg-warning-800 dark:text-warning-200') }}">
+                                        {{ $taskSchedule->status === 'completed' ? 'Klar' :
+                                           ($taskSchedule->status === 'overdue' ? 'Försenad' : 'Väntande') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
