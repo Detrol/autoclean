@@ -17,49 +17,46 @@
     </div>
 
     <div class="card-modern-elevated p-6 mb-8 bg-white dark:bg-gray-800">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl gradient-purple shadow-lg shadow-purple-500/25 flex items-center justify-center">
-                    <x-heroicon-o-building-storefront class="w-6 h-6 text-white" />
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $station->name }}</h1>
-                    <p class="text-gray-600 dark:text-gray-400">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, j F Y') }}</p>
-                    @if($station->description)
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $station->description }}</p>
-                    @endif
-                </div>
+        <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl gradient-purple shadow-lg shadow-purple-500/25 flex items-center justify-center">
+                <x-heroicon-o-building-storefront class="w-6 h-6 text-white" />
             </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $station->name }}</h1>
+                <p class="text-gray-600 dark:text-gray-400">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, j F Y') }}</p>
+            </div>
+        </div>
 
-            @if(!$isLoggedIn)
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <flux:button
-                        wire:click="clockIn(false)"
-                        wire:confirm="Är du säker på att du vill klocka in för ordinarie arbetstid?"
-                        variant="primary"
-                        icon="clock"
-                        class="gradient-primary text-white cursor-pointer"
-                    >
-                        Klocka in
-                    </flux:button>
-                    <flux:button
-                        wire:click="clockInOncall"
-                        wire:confirm="Är du säker på att du vill klocka in för jour?"
-                        variant="filled"
-                        icon="phone"
-                        class="gradient-orange !text-white cursor-pointer"
-                        title="Klocka in för jour"
-                    >
-                        Jour
-                    </flux:button>
-                </div>
-            @else
+        @if(!$isLoggedIn)
+            <div class="flex flex-col sm:flex-row gap-2">
+                <flux:button
+                    wire:click="clockIn(false)"
+                    wire:confirm="Är du säker på att du vill klocka in för ordinarie arbetstid?"
+                    variant="primary"
+                    icon="clock"
+                    class="gradient-primary text-white cursor-pointer"
+                >
+                    Klocka in
+                </flux:button>
+                <flux:button
+                    wire:click="clockInOncall"
+                    wire:confirm="Är du säker på att du vill klocka in för jour?"
+                    variant="filled"
+                    icon="phone"
+                    class="gradient-orange !text-white cursor-pointer"
+                    title="Klocka in för jour"
+                >
+                    Jour
+                </flux:button>
+            </div>
+        @else
+            <div class="flex justify-start">
                 <div class="status-badge bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200">
                     <x-heroicon-o-check class="w-4 h-4" />
                     Inklockat
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
 
     @if (session()->has('message'))
@@ -153,8 +150,8 @@
                         {{ $taskSchedule->status === 'completed' ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-700' :
                            ($taskSchedule->status === 'overdue' ? 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-700' :
                             'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700') }}">
-                        <div>
-                            <div class="flex items-center gap-3 mb-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
                                 @if($taskSchedule->status === 'completed')
                                     <button
                                         wire:click="uncompleteTask({{ $taskSchedule->id }})"
@@ -172,34 +169,33 @@
                                     />
                                 @endif
 
-                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 {{ $taskSchedule->status === 'completed' ? 'line-through' : '' }}">
-                                    {{ $taskSchedule->task->name }}
-                                </span>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100 {{ $taskSchedule->status === 'completed' ? 'line-through' : '' }}">
+                                        {{ $taskSchedule->task->name }}
+                                    </span>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                        @if($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
+                                            <span>Slutförd av {{ $taskSchedule->completedBy->name }}</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="flex items-center justify-between">
-                                <div class="text-xs text-gray-600 dark:text-gray-400">
-                                    @if($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
-                                        <span>Slutförd av {{ $taskSchedule->completedBy->name }}</span>
-                                    @endif
-                                </div>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    wire:click="toggleCommentForm({{ $taskSchedule->id }})"
+                                    class="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                                    title="Lägg till kommentar"
+                                >
+                                    <x-heroicon-o-chat-bubble-left-ellipsis class="w-4 h-4" />
+                                </button>
 
-                                <div class="flex items-center gap-2">
-                                    <button
-                                        wire:click="toggleCommentForm({{ $taskSchedule->id }})"
-                                        class="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-                                        title="Lägg till kommentar"
-                                    >
-                                        <x-heroicon-o-chat-bubble-left-ellipsis class="w-4 h-4" />
-                                    </button>
-
-                                    <div class="status-badge
-                                        {{ $taskSchedule->status === 'completed' ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' :
-                                           ($taskSchedule->status === 'overdue' ? 'bg-danger-100 text-danger-800 dark:bg-danger-800 dark:text-danger-200' :
-                                            'bg-warning-100 text-warning-800 dark:bg-warning-800 dark:text-warning-200') }}">
-                                        {{ $taskSchedule->status === 'completed' ? 'Klar' :
-                                           ($taskSchedule->status === 'overdue' ? 'Försenad' : 'Väntande') }}
-                                    </div>
+                                <div class="status-badge
+                                    {{ $taskSchedule->status === 'completed' ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' :
+                                       ($taskSchedule->status === 'overdue' ? 'bg-danger-100 text-danger-800 dark:bg-danger-800 dark:text-danger-200' :
+                                        'bg-warning-100 text-warning-800 dark:bg-warning-800 dark:text-warning-200') }}">
+                                    {{ $taskSchedule->status === 'completed' ? 'Klar' :
+                                       ($taskSchedule->status === 'overdue' ? 'Försenad' : 'Väntande') }}
                                 </div>
                             </div>
                         </div>
