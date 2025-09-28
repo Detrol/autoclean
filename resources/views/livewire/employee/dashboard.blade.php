@@ -4,11 +4,11 @@
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Dashboard</h1>
             <p class="text-gray-600 dark:text-gray-400">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, j F Y') }}</p>
         </div>
-        
+
         <div class="flex items-center gap-4">
-            <flux:input 
-                wire:model.live="selectedDate" 
-                type="date" 
+            <flux:input
+                wire:model.live="selectedDate"
+                type="date"
                 class="w-40"
             />
         </div>
@@ -99,23 +99,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <div class="text-right">
-                                    <div class="text-lg font-mono font-bold text-primary-700 dark:text-primary-300">
-                                        <span data-timer="{{ $timeLog->clock_in->timestamp }}" class="live-timer">
-                                            {{ gmdate('H:i:s', $timeLog->clock_in->diffInSeconds(now())) }}
-                                        </span>
-                                    </div>
+                            <div class="text-right">
+                                <div class="text-lg font-mono font-bold text-primary-700 dark:text-primary-300">
+                                    <span data-timer="{{ $timeLog->clock_in->timestamp }}" class="live-timer">
+                                        {{ gmdate('H:i:s', $timeLog->clock_in->diffInSeconds(now())) }}
+                                    </span>
                                 </div>
-                                <flux:button 
-                                    size="sm" 
-                                    variant="danger"
-                                    wire:click="clockOut({{ $timeLog->id }})"
-                                    wire:confirm="Är du säker på att du vill klocka ut?"
-                                    class="gradient-danger text-white cursor-pointer"
-                                >
-                                    Klocka ut
-                                </flux:button>
                             </div>
                         </div>
                     </div>
@@ -177,6 +166,11 @@
     {{-- Enhanced Stations and Tasks --}}
     <div class="grid gap-8 lg:grid-cols-2">
         @forelse($userStations as $station)
+            @php
+                $stationTasks = $tasksByStation->get($station->id, collect());
+                $totalTasks = $stationTasks->count();
+                $completedTasks = $stationTasks->where('status', 'completed')->count();
+            @endphp
             <div class="card-modern-elevated overflow-hidden bg-white dark:bg-gray-800">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-3">
@@ -188,35 +182,10 @@
                                 {{ $station->name }}
                             </a>
                         </div>
-                        
-                        @if(!auth()->user()->hasActiveTimeLog($station->id))
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <flux:button
-                                    size="sm"
-                                    variant="primary"
-                                    wire:click="clockIn({{ $station->id }})"
-                                    wire:confirm="Är du säker på att du vill klocka in för ordinarie arbetstid?"
-                                    icon="clock"
-                                    class="gradient-primary text-white cursor-pointer"
-                                >
-                                    Klocka in
-                                </flux:button>
-                                <flux:button
-                                    size="sm"
-                                    variant="filled"
-                                    wire:click="clockInOncall({{ $station->id }})"
-                                    wire:confirm="Är du säker på att du vill klocka in för jour?"
-                                    icon="phone"
-                                    class="gradient-orange !text-white cursor-pointer"
-                                    title="Klocka in för jour"
-                                >
-                                    Jour
-                                </flux:button>
-                            </div>
-                        @else
-                            <div class="status-badge bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200">
-                                <x-heroicon-o-check class="w-3 h-3" />
-                                Inklockat
+                        @if($totalTasks > 0)
+                            <div class="status-badge {{ $completedTasks === $totalTasks ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' : 'bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200' }}">
+                                <x-heroicon-o-clipboard-document-check class="w-4 h-4" />
+                                {{ $completedTasks }}/{{ $totalTasks }}
                             </div>
                         @endif
                     </div>

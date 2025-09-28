@@ -115,44 +115,6 @@ class Dashboard extends Component
         $this->selectedDate = $date;
     }
 
-    public function clockIn($stationId, $isOncall = false)
-    {
-        $user = Auth::user();
-
-        // Kontrollera om användaren redan är inklockat på denna station
-        if ($user->hasActiveTimeLog($stationId)) {
-            session()->flash('error', 'Du är redan inklockat på denna station.');
-            return;
-        }
-
-        TimeLog::create([
-            'user_id' => $user->id,
-            'station_id' => $stationId,
-            'is_oncall' => $isOncall,
-            'clock_in' => now(),
-            'date' => now()->format('Y-m-d'),
-        ]);
-
-        $type = $isOncall ? 'jour' : 'ordinarie arbetstid';
-        session()->flash('message', "Inklockat framgångsrikt för {$type}!");
-    }
-
-    public function clockInOncall($stationId)
-    {
-        $this->clockIn($stationId, true);
-    }
-
-    public function clockOut($timeLogId, $notes = null)
-    {
-        $timeLog = TimeLog::where('id', $timeLogId)
-            ->where('user_id', Auth::id())
-            ->active()
-            ->firstOrFail();
-
-        $timeLog->clockOut($notes);
-
-        session()->flash('message', 'Utklockat framgångsrikt!');
-    }
 
     public function completeTask($taskScheduleId)
     {
