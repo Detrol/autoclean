@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('station/{id}', StationDetails::class)->name('station.details');
     Route::get('station/{id}/tasks', StationTasks::class)->name('station.tasks');
     Route::get('time-reports', \App\Livewire\Employee\TimeReports::class)->name('time-reports');
+    Route::get('time-reports/export', \App\Http\Controllers\Exports\TimeReportsExportController::class)->name('time-reports.export');
 
     // Admin routes
     Route::middleware('can:admin')->group(function () {

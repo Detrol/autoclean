@@ -128,4 +128,9 @@ class TimeLog extends Model
     {
         return $query->where('is_oncall', false);
     }
+
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
 }

@@ -63,6 +63,20 @@
             icon-trailing="chevron-right">
             Nästa
         </flux:button>
+
+        <flux:dropdown position="bottom" align="end">
+            <flux:button variant="filled" icon="arrow-down-tray">
+                Exportera
+            </flux:button>
+        
+            <flux:menu>
+                <flux:menu.item 
+                    :href="route('time-reports.export', ['period' => $periodType, 'date' => $selectedDate, 'format' => 'csv'])"
+                    icon="document-arrow-down">
+                    CSV
+                </flux:menu.item>
+            </flux:menu>
+        </flux:dropdown>
     </div>
 
     <!-- Statistics Cards -->
