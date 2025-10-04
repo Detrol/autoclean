@@ -75,6 +75,11 @@
                     icon="document-arrow-down">
                     CSV
                 </flux:menu.item>
+                <flux:menu.item 
+                    :href="route('time-reports.export', ['period' => $periodType, 'date' => $selectedDate, 'format' => 'pdf'])"
+                    icon="document-text">
+                    PDF
+                </flux:menu.item>
             </flux:menu>
         </flux:dropdown>
     </div>

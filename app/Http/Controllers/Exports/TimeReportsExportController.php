@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Exports;
 
 use App\Http\Controllers\Controller;
 use App\Models\TimeLog;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TimeReportsExportController extends Controller
 {
@@ -15,7 +17,7 @@ class TimeReportsExportController extends Controller
         $validated = $request->validate([
             'period' => 'required|in:day,week,month,year',
             'date' => 'required|date_format:Y-m-d',
-            'format' => 'nullable|in:csv',
+            'format' => 'nullable|in:csv,pdf',
         ]);
 
         $period = $validated['period'];
@@ -40,20 +42,12 @@ class TimeReportsExportController extends Controller
         $summary = $this->computeSummaryStatistics($timeLogs);
         $perStationStats = $this->computePerStationStatistics($timeLogs);
 
-        // Generate filename
-        $filename = sprintf(
-            'tidsrapport-%s-%s-%s.csv',
-            $period,
-            $startDate->toDateString(),
-            $endDate->toDateString()
-        );
-
-        // Return CSV download
-        return response()->streamDownload(function () use ($summary, $perStationStats, $timeLogs) {
-            $this->generateCsvContent($summary, $perStationStats, $timeLogs);
-        }, $filename, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-        ]);
+        // Handle different formats
+        if ($format === 'pdf') {
+            return $this->generatePdfExport($user, $summary, $perStationStats, $timeLogs, $period, $startDate, $endDate);
+        } else {
+            return $this->generateCsvExport($summary, $perStationStats, $timeLogs, $period, $startDate, $endDate);
+        }
     }
 
     private function computePeriodBoundaries(string $selectedDate, string $period): array
@@ -176,5 +170,70 @@ class TimeReportsExportController extends Controller
     private function hoursSv(float $hours): string
     {
         return number_format($hours, 1, ',', '');
+    }
+
+    private function generateCsvExport($summary, $perStationStats, $timeLogs, $period, $startDate, $endDate)
+    {
+        $filename = sprintf(
+            'tidsrapport-%s-%s-%s.csv',
+            $period,
+            $startDate->toDateString(),
+            $endDate->toDateString()
+        );
+
+        return response()->streamDownload(function () use ($summary, $perStationStats, $timeLogs) {
+            $this->generateCsvContent($summary, $perStationStats, $timeLogs);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    private function generatePdfExport($user, $summary, $perStationStats, $timeLogs, $period, $startDate, $endDate)
+    {
+        $filename = sprintf(
+            'tidsrapport-%s-%s-%s.pdf',
+            $period,
+            $startDate->toDateString(),
+            $endDate->toDateString()
+        );
+
+        $periodLabel = $this->getPeriodLabel($period, $startDate);
+
+        $pdf = Pdf::loadView('exports.time-reports-pdf', [
+            'summary' => $summary,
+            'perStationStats' => $perStationStats,
+            'timeLogs' => $timeLogs,
+            'periodLabel' => $periodLabel,
+            'userName' => $user->name,
+        ]);
+
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->setOptions([
+            'defaultFont' => 'DejaVu Sans',
+            'isRemoteEnabled' => false,
+            'isHtml5ParserEnabled' => true,
+            'fontSubsetting' => false,
+        ]);
+
+        return $pdf->download($filename);
+    }
+
+    private function getPeriodLabel(string $period, Carbon $startDate): string
+    {
+        switch ($period) {
+            case 'day':
+                return $startDate->isoFormat('D MMMM YYYY');
+            case 'week':
+                $endDate = $startDate->copy()->endOfWeek();
+                return 'Vecka ' . $startDate->weekOfYear . ' (' . 
+                       $startDate->isoFormat('D MMM') . ' - ' . 
+                       $endDate->isoFormat('D MMM YYYY') . ')';
+            case 'month':
+                return $startDate->isoFormat('MMMM YYYY');
+            case 'year':
+                return $startDate->format('Y');
+            default:
+                return '';
+        }
     }
 }
