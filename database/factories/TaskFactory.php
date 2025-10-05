@@ -16,7 +16,7 @@ class TaskFactory extends Factory
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    protected \ = Task::class;
+    protected $model = Task::class;
 
     /**
      * Define the model's default state.
@@ -27,15 +27,15 @@ class TaskFactory extends Factory
     {
         return [
             'station_id' => Station::factory(),
-            'name' => \->faker->words(3, true),
-            'description' => \->faker->sentence(),
-            'interval_type' => \->faker->randomElement(['daily', 'weekly', 'monthly']),
-            'interval_value' => \->faker->numberBetween(1, 7),
-            'start_date' => \->faker->dateTimeBetween('-1 month', 'now'),
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->sentence(),
+            'interval_type' => $this->faker->randomElement(['daily', 'weekly', 'monthly']),
+            'interval_value' => $this->faker->numberBetween(1, 7),
+            'start_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'recurrence_pattern' => [],
             'end_date' => null,
             'occurrences' => null,
-            'default_due_time' => \->faker->time('H:i'),
+            'default_due_time' => $this->faker->time('H:i'),
             'is_active' => true,
         ];
     }
@@ -45,7 +45,7 @@ class TaskFactory extends Factory
      */
     public function inactive(): static
     {
-        return \->state(fn (array \) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
@@ -55,7 +55,7 @@ class TaskFactory extends Factory
      */
     public function daily(): static
     {
-        return \->state(fn (array \) => [
+        return $this->state(fn (array $attributes) => [
             'interval_type' => 'daily',
             'interval_value' => 1,
         ]);
@@ -66,7 +66,7 @@ class TaskFactory extends Factory
      */
     public function weekly(): static
     {
-        return \->state(fn (array \) => [
+        return $this->state(fn (array $attributes) => [
             'interval_type' => 'weekly',
             'interval_value' => 1,
         ]);
@@ -77,7 +77,7 @@ class TaskFactory extends Factory
      */
     public function monthly(): static
     {
-        return \->state(fn (array \) => [
+        return $this->state(fn (array $attributes) => [
             'interval_type' => 'monthly',
             'interval_value' => 1,
         ]);

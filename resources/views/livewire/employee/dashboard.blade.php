@@ -145,10 +145,7 @@
                             </div>
                             <div class="text-right">
                                 <div class="text-lg font-mono font-bold text-gray-700 dark:text-gray-300">
-                                    {{ number_format($timeLog->total_minutes / 60, 1) }}h
-                                </div>
-                                <div class="text-xs text-gray-600 dark:text-gray-400">
-                                    {{ round($timeLog->total_minutes) }} min
+                                    {{ app(App\Support\TimeFormatter::class)->formatMinutesSv($timeLog->total_minutes ?? 0) }}
                                 </div>
                             </div>
                         </div>

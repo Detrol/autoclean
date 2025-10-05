@@ -74,9 +74,9 @@ class TimeReportsExportController extends Controller
         $oncallLogs = $timeLogs->where('is_oncall', true);
 
         return [
-            'total_hours' => round($timeLogs->sum('total_minutes') / 60, 2),
-            'regular_hours' => round($regularLogs->sum('total_minutes') / 60, 2),
-            'oncall_hours' => round($oncallLogs->sum('total_minutes') / 60, 2),
+            'total_minutes' => $timeLogs->sum('total_minutes'),
+            'regular_minutes' => $regularLogs->sum('total_minutes'),
+            'oncall_minutes' => $oncallLogs->sum('total_minutes'),
             'days_worked' => $timeLogs->pluck('date')->unique()->count(),
             'regular_days' => $regularLogs->pluck('date')->unique()->count(),
             'oncall_days' => $oncallLogs->pluck('date')->unique()->count(),
@@ -88,9 +88,9 @@ class TimeReportsExportController extends Controller
         return $timeLogs->groupBy('station.name')
             ->map(function ($logs) {
                 return [
-                    'regular' => round($logs->where('is_oncall', false)->sum('total_minutes') / 60, 2),
-                    'oncall' => round($logs->where('is_oncall', true)->sum('total_minutes') / 60, 2),
-                    'total' => round($logs->sum('total_minutes') / 60, 2),
+                    'regular_minutes' => $logs->where('is_oncall', false)->sum('total_minutes'),
+                    'oncall_minutes' => $logs->where('is_oncall', true)->sum('total_minutes'),
+                    'total_minutes' => $logs->sum('total_minutes'),
                 ];
             })
             ->sortKeys();
@@ -103,9 +103,9 @@ class TimeReportsExportController extends Controller
 
         // Summary section
         $this->csvRow(['Summering']);
-        $this->csvRow(['Totalt timmar', $this->hoursSv($summary['total_hours'])]);
-        $this->csvRow(['Ordinarie timmar', $this->hoursSv($summary['regular_hours'])]);
-        $this->csvRow(['Jour timmar', $this->hoursSv($summary['oncall_hours'])]);
+        $this->csvRow(['Total tid', $this->formatTimeSv($summary['total_minutes']), $summary['total_minutes']]);
+        $this->csvRow(['Ordinarie tid', $this->formatTimeSv($summary['regular_minutes']), $summary['regular_minutes']]);
+        $this->csvRow(['Jour tid', $this->formatTimeSv($summary['oncall_minutes']), $summary['oncall_minutes']]);
         $this->csvRow(['Dagar', $summary['days_worked']]);
         $this->csvRow(['Ordinarie dagar', $summary['regular_days']]);
         $this->csvRow(['Jour dagar', $summary['oncall_days']]);
@@ -115,15 +115,18 @@ class TimeReportsExportController extends Controller
 
         // Per-station table
         if ($perStationStats->isNotEmpty()) {
-            $this->csvRow(['Timmar per station']);
-            $this->csvRow(['Station', 'Ordinarie timmar', 'Jour timmar', 'Totalt']);
+            $this->csvRow(['Tid per station']);
+            $this->csvRow(['Station', 'Ordinarie tid', 'Ordinarie minuter', 'Jour tid', 'Jour minuter', 'Total tid', 'Total minuter']);
             
-            foreach ($perStationStats as $stationName => $hours) {
+            foreach ($perStationStats as $stationName => $minutes) {
                 $this->csvRow([
                     $stationName ?: 'Okänd station',
-                    $this->hoursSv($hours['regular']),
-                    $this->hoursSv($hours['oncall']),
-                    $this->hoursSv($hours['total'])
+                    $this->formatTimeSv($minutes['regular_minutes']),
+                    $minutes['regular_minutes'],
+                    $this->formatTimeSv($minutes['oncall_minutes']),
+                    $minutes['oncall_minutes'],
+                    $this->formatTimeSv($minutes['total_minutes']),
+                    $minutes['total_minutes']
                 ]);
             }
         }
@@ -132,7 +135,7 @@ class TimeReportsExportController extends Controller
         $this->csvRow([]);
 
         // Detailed logs table
-        $this->csvRow(['Datum', 'Veckodag', 'Station', 'Typ', 'Timmar', 'Anteckningar']);
+        $this->csvRow(['Datum', 'Veckodag', 'Station', 'Typ', 'Tid', 'Minuter', 'Anteckningar']);
         
         foreach ($timeLogs as $log) {
             $this->csvRow([
@@ -140,7 +143,8 @@ class TimeReportsExportController extends Controller
                 $this->getSwedishWeekdayAbbrev($log->date),
                 $log->station->name ?? '',
                 $log->is_oncall ? 'Jour' : 'Ordinarie',
-                $this->hoursSv($log->total_hours),
+                $this->formatTimeSv($log->total_minutes),
+                $log->total_minutes,
                 $log->notes ?? ''
             ]);
         }
@@ -168,9 +172,9 @@ class TimeReportsExportController extends Controller
         echo implode(';', array_map([$this, 'csvField'], $fields)) . "\r\n";
     }
 
-    private function hoursSv(float $hours): string
+    private function formatTimeSv(?int $minutes): string
     {
-        return number_format($hours, 1, ',', '');
+        return app(\App\Support\TimeFormatter::class)->formatMinutesSv($minutes);
     }
 
     private function generateCsvExport($summary, $perStationStats, $timeLogs, $period, $startDate, $endDate)

@@ -56,28 +56,28 @@ class TimeReports extends Component
         $oncallLogs = $timeLogs->where('is_oncall', true);
 
         $stats = [
-            'total_hours' => round($timeLogs->sum('total_minutes') / 60, 2),
-            'regular_hours' => round($regularLogs->sum('total_minutes') / 60, 2),
-            'oncall_hours' => round($oncallLogs->sum('total_minutes') / 60, 2),
+            'total_minutes' => $timeLogs->sum('total_minutes'),
+            'regular_minutes' => $regularLogs->sum('total_minutes'),
+            'oncall_minutes' => $oncallLogs->sum('total_minutes'),
             'days_worked' => $timeLogs->pluck('date')->unique()->count(),
             'regular_days' => $regularLogs->pluck('date')->unique()->count(),
             'oncall_days' => $oncallLogs->pluck('date')->unique()->count(),
         ];
 
-        // Timmar per station
-        $hoursByStation = $timeLogs->groupBy('station.name')
+        // Minuter per station
+        $minutesByStation = $timeLogs->groupBy('station.name')
             ->map(function ($logs) {
                 return [
-                    'regular' => round($logs->where('is_oncall', false)->sum('total_minutes') / 60, 2),
-                    'oncall' => round($logs->where('is_oncall', true)->sum('total_minutes') / 60, 2),
-                    'total' => round($logs->sum('total_minutes') / 60, 2),
+                    'regular_minutes' => $logs->where('is_oncall', false)->sum('total_minutes'),
+                    'oncall_minutes' => $logs->where('is_oncall', true)->sum('total_minutes'),
+                    'total_minutes' => $logs->sum('total_minutes'),
                 ];
             });
 
         return view('livewire.employee.time-reports', [
             'timeLogs' => $timeLogs,
             'stats' => $stats,
-            'hoursByStation' => $hoursByStation,
+            'minutesByStation' => $minutesByStation,
             'periodLabel' => $this->getPeriodLabel(),
         ]);
     }

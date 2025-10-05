@@ -179,20 +179,20 @@
         <h2>Sammanfattning</h2>
         <div class="stats-grid">
             <div class="stats-row">
-                <div class="stats-cell stats-label">Totalt timmar:</div>
-                <div class="stats-cell stats-value">{{ number_format($summary['total_hours'], 1, ',', ' ') }} h</div>
+                <div class="stats-cell stats-label">Total tid:</div>
+                <div class="stats-cell stats-value">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($summary['total_minutes'] ?? 0) }}</div>
                 <div class="stats-cell stats-label" style="padding-left: 30px;">Arbetade dagar:</div>
                 <div class="stats-cell stats-value">{{ $summary['days_worked'] }}</div>
             </div>
             <div class="stats-row">
-                <div class="stats-cell stats-label">Ordinarie timmar:</div>
-                <div class="stats-cell stats-value">{{ number_format($summary['regular_hours'], 1, ',', ' ') }} h</div>
+                <div class="stats-cell stats-label">Ordinarie tid:</div>
+                <div class="stats-cell stats-value">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($summary['regular_minutes'] ?? 0) }}</div>
                 <div class="stats-cell stats-label" style="padding-left: 30px;">Ordinarie dagar:</div>
                 <div class="stats-cell stats-value">{{ $summary['regular_days'] }}</div>
             </div>
             <div class="stats-row">
-                <div class="stats-cell stats-label">Jour timmar:</div>
-                <div class="stats-cell stats-value">{{ number_format($summary['oncall_hours'], 1, ',', ' ') }} h</div>
+                <div class="stats-cell stats-label">Jour tid:</div>
+                <div class="stats-cell stats-value">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($summary['oncall_minutes'] ?? 0) }}</div>
                 <div class="stats-cell stats-label" style="padding-left: 30px;">Jour dagar:</div>
                 <div class="stats-cell stats-value">{{ $summary['oncall_days'] }}</div>
             </div>
@@ -202,7 +202,7 @@
     <!-- Per Station Section -->
     @if($perStationStats->isNotEmpty())
     <div class="section">
-        <h3>Timmar per station</h3>
+        <h3>Tid per station</h3>
         <table>
             <thead>
                 <tr>
@@ -213,12 +213,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($perStationStats as $stationName => $hours)
+                @foreach($perStationStats as $stationName => $minutes)
                 <tr>
                     <td>{{ $stationName ?: 'Okänd station' }}</td>
-                    <td class="text-right">{{ number_format($hours['regular'], 1, ',', ' ') }} h</td>
-                    <td class="text-right">{{ number_format($hours['oncall'], 1, ',', ' ') }} h</td>
-                    <td class="text-right font-bold">{{ number_format($hours['total'], 1, ',', ' ') }} h</td>
+                    <td class="text-right">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($minutes['regular_minutes'] ?? 0) }}</td>
+                    <td class="text-right">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($minutes['oncall_minutes'] ?? 0) }}</td>
+                    <td class="text-right font-bold">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($minutes['total_minutes'] ?? 0) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -239,7 +239,7 @@
                         <th>Veckodag</th>
                         <th>Station</th>
                         <th>Typ</th>
-                        <th class="text-right">Timmar</th>
+                        <th class="text-right">Tid</th>
                         <th>Anteckningar</th>
                     </tr>
                 </thead>
@@ -254,7 +254,7 @@
                                 {{ $log->is_oncall ? 'Jour' : 'Ordinarie' }}
                             </span>
                         </td>
-                        <td class="text-right font-bold">{{ number_format($log->total_hours, 1, ',', ' ') }} h</td>
+                        <td class="text-right font-bold">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($log->total_minutes ?? 0) }}</td>
                         <td class="text-sm">{{ $log->notes ?? '' }}</td>
                     </tr>
                     @endforeach

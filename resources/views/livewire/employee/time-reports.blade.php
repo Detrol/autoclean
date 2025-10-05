@@ -86,22 +86,22 @@
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-        <!-- Total Hours -->
+        <!-- Total Time -->
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-            <div class="text-sm text-gray-600 dark:text-gray-400">Totala timmar</div>
-            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['total_hours'], 1) }}h</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total tid</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($stats['total_minutes'] ?? 0) }}</div>
         </div>
 
-        <!-- Regular Hours -->
+        <!-- Regular Time -->
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <div class="text-sm text-gray-600 dark:text-gray-400">Ordinarie</div>
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ number_format($stats['regular_hours'], 1) }}h</div>
+            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($stats['regular_minutes'] ?? 0) }}</div>
         </div>
 
-        <!-- On-call Hours -->
+        <!-- On-call Time -->
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <div class="text-sm text-gray-600 dark:text-gray-400">Jour</div>
-            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ number_format($stats['oncall_hours'], 1) }}h</div>
+            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($stats['oncall_minutes'] ?? 0) }}</div>
         </div>
 
         <!-- Days Worked -->
@@ -123,10 +123,10 @@
         </div>
     </div>
 
-    <!-- Hours by Station -->
-    @if($hoursByStation->isNotEmpty())
+    <!-- Time by Station -->
+    @if($minutesByStation->isNotEmpty())
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 p-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Timmar per station</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tid per station</h3>
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b dark:border-gray-700">
@@ -138,12 +138,12 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y dark:divide-gray-700">
-                    @foreach($hoursByStation as $station => $hours)
+                    @foreach($minutesByStation as $station => $minutes)
                     <tr>
                         <td class="py-2 px-2 text-sm text-gray-900 dark:text-white">{{ $station }}</td>
-                        <td class="py-2 px-2 text-sm text-right text-blue-600 dark:text-blue-400">{{ number_format($hours['regular'], 1) }}h</td>
-                        <td class="py-2 px-2 text-sm text-right text-purple-600 dark:text-purple-400">{{ number_format($hours['oncall'], 1) }}h</td>
-                        <td class="py-2 px-2 text-sm text-right font-semibold text-gray-900 dark:text-white">{{ number_format($hours['total'], 1) }}h</td>
+                        <td class="py-2 px-2 text-sm text-right text-blue-600 dark:text-blue-400">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($minutes['regular_minutes'] ?? 0) }}</td>
+                        <td class="py-2 px-2 text-sm text-right text-purple-600 dark:text-purple-400">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($minutes['oncall_minutes'] ?? 0) }}</td>
+                        <td class="py-2 px-2 text-sm text-right font-semibold text-gray-900 dark:text-white">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($minutes['total_minutes'] ?? 0) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -173,7 +173,7 @@
                             <th class="text-left py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Typ</th>
                             <th class="text-left py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Inklockat</th>
                             <th class="text-left py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Utklockat</th>
-                            <th class="text-right py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Timmar</th>
+                            <th class="text-right py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Tid</th>
                             <th class="text-left py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Anteckningar</th>
                         </tr>
                     </thead>
@@ -200,7 +200,7 @@
                                 {{ $log->clock_out ? $log->clock_out->format('H:i') : '-' }}
                             </td>
                             <td class="py-3 px-4 text-sm text-right font-medium text-gray-900 dark:text-white">
-                                {{ number_format($log->total_hours, 1) }}h
+                                {{ app(App\Support\TimeFormatter::class)->formatMinutesSv($log->total_minutes ?? 0) }}
                             </td>
                             <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
                                 {{ $log->notes ?? '-' }}
@@ -214,7 +214,7 @@
                                 Totalt för perioden
                             </td>
                             <td class="py-3 px-4 text-sm text-right font-bold text-gray-900 dark:text-white">
-                                {{ number_format($stats['total_hours'], 1) }}h
+                                {{ app(App\Support\TimeFormatter::class)->formatMinutesSv($stats['total_minutes'] ?? 0) }}
                             </td>
                             <td></td>
                         </tr>

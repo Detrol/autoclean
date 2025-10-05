@@ -70,10 +70,10 @@ class Dashboard extends Component
                 ->where('completed_by', $user->id)->count(),
             'pending_today' => $todaysTasks->where('status', 'pending')->count(),
             'overdue_today' => $todaysTasks->where('status', 'overdue')->count(),
-            'total_hours_today' => max(0, $user->timeLogs()
+            'total_minutes_today' => max(0, $user->timeLogs()
                 ->whereDate('date', $today)
                 ->completed()
-                ->sum('total_minutes') / 60),
+                ->sum('total_minutes')),
         ];
 
         // Hämta task templates för alla stationer
