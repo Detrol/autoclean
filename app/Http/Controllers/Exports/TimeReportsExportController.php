@@ -220,7 +220,7 @@ class TimeReportsExportController extends Controller
         return $pdf->download($filename);
     }
 
-    private function getSwedishWeekdayAbbrev(?Carbon $date): string
+    public function getSwedishWeekdayAbbrev(?Carbon $date): string
     {
         if (!$date) {
             return '';
