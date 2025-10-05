@@ -132,11 +132,12 @@ class TimeReportsExportController extends Controller
         $this->csvRow([]);
 
         // Detailed logs table
-        $this->csvRow(['Datum', 'Station', 'Typ', 'Timmar', 'Anteckningar']);
+        $this->csvRow(['Datum', 'Veckodag', 'Station', 'Typ', 'Timmar', 'Anteckningar']);
         
         foreach ($timeLogs as $log) {
             $this->csvRow([
                 $log->date->format('Y-m-d'),
+                $this->getSwedishWeekdayAbbrev($log->date),
                 $log->station->name ?? '',
                 $log->is_oncall ? 'Jour' : 'Ordinarie',
                 $this->hoursSv($log->total_hours),
@@ -205,6 +206,7 @@ class TimeReportsExportController extends Controller
             'timeLogs' => $timeLogs,
             'periodLabel' => $periodLabel,
             'userName' => $user->name,
+            'getWeekday' => [$this, 'getSwedishWeekdayAbbrev'],
         ]);
 
         $pdf->setPaper('A4', 'portrait');
@@ -216,6 +218,29 @@ class TimeReportsExportController extends Controller
         ]);
 
         return $pdf->download($filename);
+    }
+
+    private function getSwedishWeekdayAbbrev(?Carbon $date): string
+    {
+        if (!$date) {
+            return '';
+        }
+        
+        // Swedish weekday abbreviations (lowercase with diacritics)
+        $weekdays = [
+            1 => 'mån', // måndag
+            2 => 'tis', // tisdag
+            3 => 'ons', // onsdag
+            4 => 'tor', // torsdag
+            5 => 'fre', // fredag
+            6 => 'lör', // lördag
+            7 => 'sön', // söndag
+        ];
+        
+        // Get day of week (1 = Monday, 7 = Sunday)
+        $dayOfWeek = $date->dayOfWeekIso;
+        
+        return $weekdays[$dayOfWeek] ?? '';
     }
 
     private function getPeriodLabel(string $period, Carbon $startDate): string

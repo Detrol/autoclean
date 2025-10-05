@@ -236,6 +236,7 @@
                 <thead>
                     <tr>
                         <th>Datum</th>
+                        <th>Veckodag</th>
                         <th>Station</th>
                         <th>Typ</th>
                         <th class="text-right">Timmar</th>
@@ -246,6 +247,7 @@
                     @foreach($timeLogs as $log)
                     <tr>
                         <td class="text-sm">{{ $log->date->format('Y-m-d') }}</td>
+                        <td class="text-sm">{{ call_user_func($getWeekday, $log->date) }}</td>
                         <td class="text-sm">{{ $log->station->name ?? '' }}</td>
                         <td>
                             <span class="type-badge {{ $log->is_oncall ? 'type-oncall' : 'type-regular' }}">
