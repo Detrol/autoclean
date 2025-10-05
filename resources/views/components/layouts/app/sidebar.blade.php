@@ -27,6 +27,7 @@
                     <flux:navlist.item icon="squares-plus" :href="route('admin.templates')" :current="request()->routeIs('admin.templates')" wire:navigate>Uppgiftsmallar</flux:navlist.item>
                     <flux:navlist.item icon="archive-box" :href="route('admin.inventory')" :current="request()->routeIs('admin.inventory')" wire:navigate>Lagerhantering</flux:navlist.item>
                     <flux:navlist.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>Användare</flux:navlist.item>
+                    <flux:navlist.item icon="document-text" href="{{ url('log-viewer') }}" target="_blank">Systemloggar</flux:navlist.item>
                 </flux:navlist.group>
                 @endcan
             </flux:navlist>
