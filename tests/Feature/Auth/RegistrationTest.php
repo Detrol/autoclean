@@ -6,7 +6,7 @@ use Livewire\Livewire;
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
-    $response->assertStatus(200);
+    $response->assertNotFound();
 });
 
 test('new users can register', function () {

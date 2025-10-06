@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Station;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,7 +11,13 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class StationFactory extends Factory
 {
     /**
-    protected  = Station::class;
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    protected $model = Station::class;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -18,9 +25,9 @@ class StationFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => ->faker->company(),
-            "description" => ->faker->sentence(),
-            "is_active" => true,
+            'name' => $this->faker->company(),
+            'description' => $this->faker->sentence(),
+            'is_active' => true,
         ];
     }
 }
