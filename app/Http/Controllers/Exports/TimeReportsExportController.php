@@ -135,7 +135,7 @@ class TimeReportsExportController extends Controller
         $this->csvRow([]);
 
         // Detailed logs table
-        $this->csvRow(['Datum', 'Veckodag', 'Station', 'Typ', 'Tid', 'Minuter', 'Anteckningar']);
+        $this->csvRow(['Datum', 'Veckodag', 'Station', 'Typ', 'Starttid', 'Sluttid', 'Tid', 'Minuter', 'Anteckningar']);
         
         foreach ($timeLogs as $log) {
             $this->csvRow([
@@ -143,6 +143,8 @@ class TimeReportsExportController extends Controller
                 $this->getSwedishWeekdayAbbrev($log->date),
                 $log->station->name ?? '',
                 $log->is_oncall ? 'Jour' : 'Ordinarie',
+                $log->clock_in ? $log->clock_in->format('H:i') : '',
+                $log->clock_out ? $log->clock_out->format('H:i') : '',
                 $this->formatTimeSv($log->total_minutes),
                 $log->total_minutes,
                 $log->notes ?? ''

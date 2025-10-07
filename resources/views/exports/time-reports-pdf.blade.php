@@ -239,6 +239,8 @@
                         <th>Veckodag</th>
                         <th>Station</th>
                         <th>Typ</th>
+                        <th>Starttid</th>
+                        <th>Sluttid</th>
                         <th class="text-right">Tid</th>
                         <th>Anteckningar</th>
                     </tr>
@@ -254,6 +256,8 @@
                                 {{ $log->is_oncall ? 'Jour' : 'Ordinarie' }}
                             </span>
                         </td>
+                        <td class="text-sm">{{ $log->clock_in ? $log->clock_in->format('H:i') : '-' }}</td>
+                        <td class="text-sm">{{ $log->clock_out ? $log->clock_out->format('H:i') : '-' }}</td>
                         <td class="text-right font-bold">{{ app(App\Support\TimeFormatter::class)->formatMinutesSv($log->total_minutes ?? 0) }}</td>
                         <td class="text-sm">{{ $log->notes ?? '' }}</td>
                     </tr>
