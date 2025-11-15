@@ -7,7 +7,7 @@
         "laravel",
         "framework"
     ],
-    "license": "MIT",
+    "license": "Fair-Source-0.9",
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",

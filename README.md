@@ -5,7 +5,7 @@
 [![Laravel](https://img.shields.io/badge/Laravel-12-red.svg)](https://laravel.com)
 [![Livewire](https://img.shields.io/badge/Livewire-3-fb70a9.svg)](https://livewire.laravel.com)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-777bb4.svg)](https://php.net)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Fair_Source-blue.svg)](LICENSE)
 
 AutoClean is a comprehensive task management and maintenance scheduling application built with Laravel 12 and Livewire 3. It provides powerful station-based task management, advanced recurring schedules, time tracking, and inventory management—perfect for cleaning services, facility management, and maintenance operations.
 
@@ -195,7 +195,14 @@ php artisan tasks:rollover-overdue # Rollover overdue tasks
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+AutoClean is licensed under the Fair Source License v0.9.
+
+**Free tier includes:**
+- Up to 1 station
+- Up to 5 users
+- Self-hosted deployment
+
+See the [LICENSE](LICENSE) file for complete terms.
 
 ## 🙏 Acknowledgments
 
