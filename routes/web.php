@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/templates', TaskTemplates::class)->name('admin.templates');
         Route::get('admin/inventory', InventoryManager::class)->name('admin.inventory');
         Route::get('admin/users', UserStationManager::class)->name('admin.users');
+        Route::get('admin/settings', \App\Livewire\Admin\SystemSettings::class)->name('admin.settings');
     });
 });
 

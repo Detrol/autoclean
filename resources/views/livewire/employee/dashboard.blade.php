@@ -163,11 +163,6 @@
     {{-- Enhanced Stations and Tasks --}}
     <div class="grid gap-8 lg:grid-cols-2">
         @forelse($userStations as $station)
-            @php
-                $stationTasks = $tasksByStation->get($station->id, collect());
-                $totalTasks = $stationTasks->count();
-                $completedTasks = $stationTasks->where('status', 'completed')->count();
-            @endphp
             <div class="card-modern-elevated overflow-hidden bg-white dark:bg-gray-800">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-3">
@@ -179,10 +174,10 @@
                                 {{ $station->name }}
                             </a>
                         </div>
-                        @if($totalTasks > 0)
-                            <div class="status-badge {{ $completedTasks === $totalTasks ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' : 'bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200' }}">
+                        @if($stationStats[$station->id]['totalTasks'] > 0)
+                            <div class="status-badge {{ $stationStats[$station->id]['completedTasks'] === $stationStats[$station->id]['totalTasks'] ? 'bg-success-100 text-success-800 dark:bg-success-800 dark:text-success-200' : 'bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200' }}">
                                 <x-heroicon-o-clipboard-document-check class="w-4 h-4" />
-                                {{ $completedTasks }}/{{ $totalTasks }}
+                                {{ $stationStats[$station->id]['completedTasks'] }}/{{ $stationStats[$station->id]['totalTasks'] }}
                             </div>
                         @endif
                     </div>

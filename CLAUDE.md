@@ -110,13 +110,19 @@ Complete authentication system with:
 - **Models**: `app/Models/` following Eloquent conventions
 - **Middleware**: `app/Http/Middleware/` for request filtering
 
+## Business Domain
+This is a task management application with cleaning/maintenance scheduling features:
+- **Core Models**: Task, TaskSchedule, TaskTemplate, TimeLog, Station, InventoryItem
+- **Key Service**: `RecurrenceCalculator` handles complex recurring task logic
+- **Features**: Task scheduling with recurrence patterns, inventory tracking, time logging, station management
+
 ## Development Environment
-- **Local Server**: nginx server runs locally, so avoid `php artisan serve` 
+- **Local Server**: Uses `composer dev` which starts all services (including php artisan serve)
 - **Database**: MySQL configured in `.env` (changed from SQLite)
 
 ## Development Workflow
 1. Create Livewire components: `php artisan make:livewire ComponentName`
 2. Run tests after changes: `./vendor/bin/pest`
 3. Format code before commits: `./vendor/bin/pint`
-4. Use `composer dev` for full-stack development (excluding php artisan serve)
+4. Use `composer dev` for full-stack development
 5. Database changes require migrations: `php artisan make:migration`

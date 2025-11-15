@@ -146,13 +146,18 @@
         @if($todaysTasks->count() > 0)
             <div class="space-y-3">
                 @foreach($todaysTasks as $taskSchedule)
-                    <div class="card-modern-elevated p-4
+                    <div class="card-modern-elevated p-4 {{ ($requiresClockIn && !$isLoggedIn && $taskSchedule->status !== 'completed') ? 'opacity-50' : '' }}
                         {{ $taskSchedule->status === 'completed' ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-700' :
                            ($taskSchedule->status === 'overdue' ? 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-700' :
                             'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700') }}">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                @if($taskSchedule->status === 'completed')
+                                @if($requiresClockIn && !$isLoggedIn && $taskSchedule->status !== 'completed')
+                                    {{-- Locked state --}}
+                                    <div class="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center" title="Du måste vara inklockat på {{ $station->name }} för att slutföra denna uppgift">
+                                        <x-heroicon-s-lock-closed class="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                                    </div>
+                                @elseif($taskSchedule->status === 'completed')
                                     <button
                                         wire:click="uncompleteTask({{ $taskSchedule->id }})"
                                         class="w-6 h-6 rounded-full bg-success-500 hover:bg-success-600 flex items-center justify-center transition-colors cursor-pointer"
@@ -174,7 +179,9 @@
                                         {{ $taskSchedule->task->name }}
                                     </span>
                                     <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                        @if($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
+                                        @if($requiresClockIn && !$isLoggedIn && $taskSchedule->status !== 'completed')
+                                            <span class="text-gray-500 dark:text-gray-500 italic">Klocka in för att slutföra uppgiften</span>
+                                        @elseif($taskSchedule->status === 'completed' && $taskSchedule->completedBy)
                                             <span>Slutförd av {{ $taskSchedule->completedBy->name }}</span>
                                         @endif
                                     </div>

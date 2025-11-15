@@ -28,3 +28,10 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+/.idea
+/.claude
+.claude/settings.local.json
+/tests
+.claude/settings.local.json
+/.claude
+CLAUDE.md

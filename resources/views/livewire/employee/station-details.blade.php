@@ -169,9 +169,17 @@
 
                             {{-- Dagens uppgift status --}}
                             @if($data['today_task'])
-                                <div class="flex items-center gap-3">
-                                    @if($data['today_task']->status === 'completed')
-                                        <button 
+                                <div class="flex items-center gap-3 {{ ($requiresClockIn && !$isLoggedIn && $data['today_task']->status !== 'completed') ? 'opacity-50' : '' }}">
+                                    @if($requiresClockIn && !$isLoggedIn && $data['today_task']->status !== 'completed')
+                                        {{-- Locked state --}}
+                                        <div class="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center" title="Du måste vara inklockat på {{ $station->name }} för att slutföra denna uppgift">
+                                            <x-heroicon-s-lock-closed class="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                                        </div>
+                                        <div class="status-badge bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                            <span class="italic">Klocka in för att slutföra</span>
+                                        </div>
+                                    @elseif($data['today_task']->status === 'completed')
+                                        <button
                                             wire:click="uncompleteTask({{ $data['today_task']->id }})"
                                             class="w-8 h-8 rounded-full bg-success-500 hover:bg-success-600 flex items-center justify-center transition-colors"
                                             title="Klicka för att avmarkera"
@@ -182,8 +190,8 @@
                                             Klar idag
                                         </div>
                                     @elseif($data['today_task']->status === 'overdue')
-                                        <input 
-                                            type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             class="w-6 h-6 text-primary-600 rounded focus:ring-primary-500"
                                             wire:click="completeTask({{ $data['today_task']->id }})"
                                         />
@@ -191,8 +199,8 @@
                                             Försenad
                                         </div>
                                     @else
-                                        <input 
-                                            type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             class="w-6 h-6 text-primary-600 rounded focus:ring-primary-500"
                                             wire:click="completeTask({{ $data['today_task']->id }})"
                                         />

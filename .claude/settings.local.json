@@ -4,7 +4,17 @@
       "Bash(php artisan make:migration:*)",
       "Bash(php artisan:*)",
       "WebSearch",
-      "mcp__zen__challenge"
+      "mcp__zen__challenge",
+      "Bash(export DB_CONNECTION=mysql)",
+      "Bash(mysql:*)",
+      "Bash(php:*)",
+      "mcp__zen__debug",
+      "Bash(rm:*)",
+      "mcp__zen__consensus",
+      "mcp__zen__analyze",
+      "mcp__zen__chat",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

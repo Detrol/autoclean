@@ -74,9 +74,20 @@ class TaskManager extends Component
             $query->where('station_id', $this->selectedStationFilter);
         }
 
+        $weekdays = [
+            'monday' => 'Mån',
+            'tuesday' => 'Tis',
+            'wednesday' => 'Ons',
+            'thursday' => 'Tor',
+            'friday' => 'Fre',
+            'saturday' => 'Lör',
+            'sunday' => 'Sön',
+        ];
+
         return view('livewire.admin.task-manager', [
             'tasks' => $query->paginate(10),
             'stations' => Station::active()->get(),
+            'weekdays' => $weekdays,
         ]);
     }
 

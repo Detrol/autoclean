@@ -32,7 +32,7 @@ class RolloverOverdueTasks extends Command
         $this->markOverdueTasks();
 
         // Kontrollera om rollover är aktiverat
-        if (config('tasks.rollover_enabled', true)) {
+        if (settings('task_rollover_enabled', true)) {
             // Flytta försenade icke-dagliga uppgifter till idag
             $this->moveOverdueTasksToToday();
         } else {

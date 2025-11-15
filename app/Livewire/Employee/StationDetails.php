@@ -91,6 +91,8 @@ class StationDetails extends Component
 
         // Kontrollera om användaren är inklockat
         $isLoggedIn = $user->hasActiveTimeLog($this->station->id);
+        $adminRequiresClockIn = settings('admin_requires_clock_in', false);
+        $requiresClockIn = ! $user->is_admin || $adminRequiresClockIn;
 
         // Hämta senaste tidslogs
         $recentTimeLogs = TimeLog::where('station_id', $this->station->id)
@@ -127,6 +129,7 @@ class StationDetails extends Component
         return view('livewire.employee.station-details', [
             'taskData' => $taskData,
             'isLoggedIn' => $isLoggedIn,
+            'requiresClockIn' => $requiresClockIn,
             'recentTimeLogs' => $recentTimeLogs,
             'todayAdditionalTasks' => $todayAdditionalTasks,
             'taskTemplates' => $taskTemplates,

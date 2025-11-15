@@ -133,17 +133,6 @@
                             <div>
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">På dessa dagar:</span>
                                 <div class="grid grid-cols-7 gap-2">
-                                    @php
-                                        $weekdays = [
-                                            'monday' => 'Mån',
-                                            'tuesday' => 'Tis', 
-                                            'wednesday' => 'Ons',
-                                            'thursday' => 'Tor',
-                                            'friday' => 'Fre',
-                                            'saturday' => 'Lör',
-                                            'sunday' => 'Sön'
-                                        ];
-                                    @endphp
                                     @foreach($weekdays as $value => $label)
                                         <label class="flex flex-col items-center gap-1">
                                             <input type="checkbox" wire:model.live="selected_weekdays" value="{{ $value }}" class="w-4 h-4 text-primary-600">

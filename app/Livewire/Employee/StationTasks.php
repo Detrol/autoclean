@@ -14,13 +14,19 @@ use Livewire\Component;
 class StationTasks extends Component
 {
     public Station $station;
+
     public $selectedDate;
+
     public $taskComments = [];
+
     public $showCommentForm = [];
 
     public $showAdditionalTaskForm = false;
+
     public $selectedTemplateId = null;
+
     public $customTaskName = '';
+
     public $additionalTaskNotes = '';
 
     public function mount($id)
@@ -29,7 +35,7 @@ class StationTasks extends Component
 
         $this->station = Station::findOrFail($id);
 
-        if (!$user->stations->contains($this->station)) {
+        if (! $user->stations->contains($this->station)) {
             abort(403, 'Du har inte åtkomst till denna station.');
         }
 
@@ -43,12 +49,12 @@ class StationTasks extends Component
 
         $todaysTasks = TaskSchedule::whereHas('task', function ($query) {
             $query->where('station_id', $this->station->id)
-                  ->where('is_active', true);
+                ->where('is_active', true);
         })
-        ->whereDate('scheduled_date', $today)
-        ->with(['task', 'completedBy'])
-        ->orderBy('due_time')
-        ->get();
+            ->whereDate('scheduled_date', $today)
+            ->with(['task', 'completedBy'])
+            ->orderBy('due_time')
+            ->get();
 
         $activeTimeLogs = $user->timeLogs()
             ->where('station_id', $this->station->id)
@@ -75,6 +81,8 @@ class StationTasks extends Component
             ->get();
 
         $isLoggedIn = $user->hasActiveTimeLog($this->station->id);
+        $adminRequiresClockIn = settings('admin_requires_clock_in', false);
+        $requiresClockIn = ! $user->is_admin || $adminRequiresClockIn;
 
         return view('livewire.employee.station-tasks', [
             'todaysTasks' => $todaysTasks,
@@ -83,6 +91,7 @@ class StationTasks extends Component
             'taskTemplates' => $taskTemplates,
             'todayAdditionalTasks' => $todayAdditionalTasks,
             'isLoggedIn' => $isLoggedIn,
+            'requiresClockIn' => $requiresClockIn,
             'selectedDate' => $today,
         ]);
     }
@@ -93,6 +102,7 @@ class StationTasks extends Component
 
         if ($user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du är redan inklockat på denna station.');
+
             return;
         }
 
@@ -130,8 +140,20 @@ class StationTasks extends Component
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
         $user = Auth::user();
 
-        if (!$user->is_admin && !$user->stations->contains($this->station->id)) {
+        if (! $user->is_admin && ! $user->stations->contains($this->station->id)) {
             session()->flash('error', 'Du har inte behörighet att slutföra denna uppgift.');
+
+            return;
+        }
+
+        // Kontrollera att användaren är inklockat på denna station
+        // Admins kan bypassa detta krav om admin_requires_clock_in är false
+        $adminRequiresClockIn = settings('admin_requires_clock_in', false);
+        $requiresClockIn = ! $user->is_admin || $adminRequiresClockIn;
+
+        if ($requiresClockIn && ! $user->hasActiveTimeLog($this->station->id)) {
+            session()->flash('error', 'Du måste vara inklockat på stationen för att markera uppgifter som slutförda.');
+
             return;
         }
 
@@ -145,13 +167,26 @@ class StationTasks extends Component
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
         $user = Auth::user();
 
-        if (!$user->is_admin && !$user->stations->contains($this->station->id)) {
+        if (! $user->is_admin && ! $user->stations->contains($this->station->id)) {
             session()->flash('error', 'Du har inte behörighet att ändra denna uppgift.');
+
             return;
         }
 
-        if (!$user->is_admin && $taskSchedule->completed_by !== Auth::id()) {
+        // Kontrollera att användaren är inklockat på denna station
+        // Admins kan bypassa detta krav om admin_requires_clock_in är false
+        $adminRequiresClockIn = settings('admin_requires_clock_in', false);
+        $requiresClockIn = ! $user->is_admin || $adminRequiresClockIn;
+
+        if ($requiresClockIn && ! $user->hasActiveTimeLog($this->station->id)) {
+            session()->flash('error', 'Du måste vara inklockat på stationen för att ändra uppgifter.');
+
+            return;
+        }
+
+        if (! $user->is_admin && $taskSchedule->completed_by !== Auth::id()) {
             session()->flash('error', 'Du kan bara avmarkera uppgifter som du själv har slutfört.');
+
             return;
         }
 
@@ -165,9 +200,9 @@ class StationTasks extends Component
 
     public function toggleCommentForm($taskScheduleId)
     {
-        $this->showCommentForm[$taskScheduleId] = !($this->showCommentForm[$taskScheduleId] ?? false);
+        $this->showCommentForm[$taskScheduleId] = ! ($this->showCommentForm[$taskScheduleId] ?? false);
 
-        if (!isset($this->taskComments[$taskScheduleId])) {
+        if (! isset($this->taskComments[$taskScheduleId])) {
             $taskSchedule = TaskSchedule::find($taskScheduleId);
             $this->taskComments[$taskScheduleId] = $taskSchedule->notes ?? '';
         }
@@ -178,13 +213,14 @@ class StationTasks extends Component
         $taskSchedule = TaskSchedule::findOrFail($taskScheduleId);
         $user = Auth::user();
 
-        if (!$user->is_admin && !$user->stations->contains($this->station->id)) {
+        if (! $user->is_admin && ! $user->stations->contains($this->station->id)) {
             session()->flash('error', 'Du har inte behörighet att kommentera denna uppgift.');
+
             return;
         }
 
         $taskSchedule->update([
-            'notes' => $this->taskComments[$taskScheduleId] ?? null
+            'notes' => $this->taskComments[$taskScheduleId] ?? null,
         ]);
 
         $this->showCommentForm[$taskScheduleId] = false;
@@ -202,8 +238,9 @@ class StationTasks extends Component
     {
         $user = Auth::user();
 
-        if (!$user->is_admin && !$user->hasActiveTimeLog($this->station->id)) {
+        if (! $user->is_admin && ! $user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att lägga till extra uppgifter.');
+
             return;
         }
 
@@ -225,8 +262,9 @@ class StationTasks extends Component
     {
         $user = Auth::user();
 
-        if (!$user->is_admin && !$user->hasActiveTimeLog($this->station->id)) {
+        if (! $user->is_admin && ! $user->hasActiveTimeLog($this->station->id)) {
             session()->flash('error', 'Du måste vara inklockat på stationen för att lägga till extra uppgifter.');
+
             return;
         }
 
@@ -240,6 +278,7 @@ class StationTasks extends Component
 
         if (empty($taskName)) {
             session()->flash('error', 'Du måste välja en mall eller ange ett anpassat namn för uppgiften.');
+
             return;
         }
 
