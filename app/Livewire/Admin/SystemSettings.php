@@ -6,7 +6,7 @@ use App\Services\SettingsService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('components.layouts.app')]
 class SystemSettings extends Component
 {
     public $settings = [];
