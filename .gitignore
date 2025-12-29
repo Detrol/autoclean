@@ -29,9 +29,45 @@ Homestead.json
 .phpactor.json
 auth.json
 /.idea
-/.claude
+
+# Claude Code settings (personal preferences only)
 .claude/settings.local.json
-/tests
-.claude/settings.local.json
-/.claude
+
+# Temporary files and debugging
+/temp/
+temp/
+**/temp/
+debug-*.js
+test-*.py
+analyze-*.sh
+*-debug.*
+*.debug
+
+# Simple Task Master (local task management)
+.simple-task-master/
+
+# AI Assistant configurations (local/personal)
+AGENTS.md
 CLAUDE.md
+GEMINI.md
+.clinerules
+.cursorrules
+.windsurfrules
+.replit.md
+.gemini/
+.idx/
+.junie/
+.github/copilot-instructions.md
+
+# Tool configurations (local)
+boost.json
+.mcp.json
+.codebasemap
+.vscode/
+
+# Feature specifications (local development)
+/specs/
+
+# Don't ignore reports directory
+!reports/
+!reports/**

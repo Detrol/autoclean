@@ -4,6 +4,7 @@ use App\Livewire\Admin\InventoryManager;
 use App\Livewire\Admin\StationManager;
 use App\Livewire\Admin\TaskManager;
 use App\Livewire\Admin\TaskTemplates;
+use App\Livewire\Admin\UserActivityDashboard;
 use App\Livewire\Admin\UserStationManager;
 use App\Livewire\Employee\StationDetails;
 use App\Livewire\Employee\StationTasks;
@@ -44,6 +45,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/templates', TaskTemplates::class)->name('admin.templates');
         Route::get('admin/inventory', InventoryManager::class)->name('admin.inventory');
         Route::get('admin/users', UserStationManager::class)->name('admin.users');
+        Route::get('admin/user-activity', UserActivityDashboard::class)->name('admin.user-activity');
+        Route::get('admin/user-activity/export', \App\Http\Controllers\Exports\AdminUserActivityExportController::class)->name('admin.user-activity.export');
         Route::get('admin/settings', \App\Livewire\Admin\SystemSettings::class)->name('admin.settings');
     });
 });

@@ -1,0 +1,327 @@
+<?php
+
+namespace App\Livewire\Admin;
+
+use App\Models\CompletedAdditionalTask;
+use App\Models\Station;
+use App\Models\TaskSchedule;
+use App\Models\TimeLog;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+class UserActivityDashboard extends Component
+{
+    use WithPagination;
+
+    public string $periodType = 'day';
+
+    public string $selectedDate;
+
+    public ?int $selectedUserId = null;
+
+    public ?int $selectedStationId = null;
+
+    public string $workType = 'all';
+
+    public string $activeTab = 'time';
+
+    protected $queryString = [
+        'periodType' => ['except' => 'day'],
+        'selectedDate' => ['except' => ''],
+        'selectedUserId' => ['except' => null],
+        'selectedStationId' => ['except' => null],
+        'workType' => ['except' => 'all'],
+        'activeTab' => ['except' => 'time'],
+    ];
+
+    public function mount(): void
+    {
+        abort_unless(Gate::allows('admin'), 403);
+        $this->selectedDate = now()->toDateString();
+    }
+
+    public function setPeriod(string $period): void
+    {
+        $this->periodType = $period;
+        $this->resetPage();
+    }
+
+    public function previousPeriod(): void
+    {
+        $date = Carbon::parse($this->selectedDate);
+        $this->selectedDate = match ($this->periodType) {
+            'day' => $date->subDay()->toDateString(),
+            'week' => $date->subWeek()->toDateString(),
+            'month' => $date->subMonth()->toDateString(),
+            'year' => $date->subYear()->toDateString(),
+        };
+        $this->resetPage();
+    }
+
+    public function nextPeriod(): void
+    {
+        $date = Carbon::parse($this->selectedDate);
+        $this->selectedDate = match ($this->periodType) {
+            'day' => $date->addDay()->toDateString(),
+            'week' => $date->addWeek()->toDateString(),
+            'month' => $date->addMonth()->toDateString(),
+            'year' => $date->addYear()->toDateString(),
+        };
+        $this->resetPage();
+    }
+
+    public function currentPeriod(): void
+    {
+        $this->selectedDate = now()->toDateString();
+        $this->resetPage();
+    }
+
+    public function setTab(string $tab): void
+    {
+        $this->activeTab = $tab;
+        $this->resetPage();
+    }
+
+    public function updatedSelectedUserId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectedStationId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedWorkType(): void
+    {
+        $this->resetPage();
+    }
+
+    public function render(): View
+    {
+        [$startDate, $endDate] = $this->computePeriodBoundaries();
+
+        return view('livewire.admin.user-activity-dashboard', [
+            'users' => User::orderBy('name')->get(),
+            'stations' => Station::active()->orderBy('name')->get(),
+            'periodLabel' => $this->getPeriodLabel($startDate),
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'timeLogs' => $this->getTimeLogs($startDate, $endDate),
+            'timeStats' => $this->getTimeStats($startDate, $endDate),
+            'userTimeBreakdown' => $this->getUserTimeBreakdown($startDate, $endDate),
+            'taskCompletions' => $this->getTaskCompletions($startDate, $endDate),
+            'additionalTasks' => $this->getAdditionalTasks($startDate, $endDate),
+        ]);
+    }
+
+    public function exportUrl(string $format): string
+    {
+        return route('admin.user-activity.export', [
+            'period' => $this->periodType,
+            'date' => $this->selectedDate,
+            'format' => $format,
+            'user_id' => $this->selectedUserId,
+            'station_id' => $this->selectedStationId,
+            'work_type' => $this->workType,
+        ]);
+    }
+
+    private function computePeriodBoundaries(): array
+    {
+        $date = Carbon::parse($this->selectedDate);
+
+        return match ($this->periodType) {
+            'day' => [$date->copy()->startOfDay(), $date->copy()->endOfDay()],
+            'week' => [$date->copy()->startOfWeek(), $date->copy()->endOfWeek()],
+            'month' => [$date->copy()->startOfMonth(), $date->copy()->endOfMonth()],
+            'year' => [$date->copy()->startOfYear(), $date->copy()->endOfYear()],
+            default => [$date->copy(), $date->copy()],
+        };
+    }
+
+    private function getPeriodLabel(Carbon $startDate): string
+    {
+        return match ($this->periodType) {
+            'day' => $startDate->isoFormat('D MMMM YYYY'),
+            'week' => 'Vecka '.$startDate->weekOfYear.' ('.
+                      $startDate->isoFormat('D MMM').' - '.
+                      $startDate->copy()->endOfWeek()->isoFormat('D MMM YYYY').')',
+            'month' => $startDate->isoFormat('MMMM YYYY'),
+            'year' => $startDate->format('Y'),
+            default => '',
+        };
+    }
+
+    private function getTimeLogs(Carbon $startDate, Carbon $endDate): LengthAwarePaginator
+    {
+        $query = TimeLog::query()
+            ->completed()
+            ->forDateRange($startDate->toDateString(), $endDate->toDateString())
+            ->with(['user', 'station'])
+            ->orderBy('date', 'desc')
+            ->orderBy('clock_in', 'desc');
+
+        if ($this->selectedUserId) {
+            $query->forUser($this->selectedUserId);
+        }
+
+        if ($this->selectedStationId) {
+            $query->where('station_id', $this->selectedStationId);
+        }
+
+        if ($this->workType === 'regular') {
+            $query->regular();
+        } elseif ($this->workType === 'oncall') {
+            $query->oncall();
+        }
+
+        return $query->paginate(15);
+    }
+
+    private function getTimeStats(Carbon $startDate, Carbon $endDate): array
+    {
+        $query = TimeLog::query()
+            ->completed()
+            ->forDateRange($startDate->toDateString(), $endDate->toDateString());
+
+        if ($this->selectedUserId) {
+            $query->forUser($this->selectedUserId);
+        }
+
+        if ($this->selectedStationId) {
+            $query->where('station_id', $this->selectedStationId);
+        }
+
+        if ($this->workType === 'regular') {
+            $query->regular();
+        } elseif ($this->workType === 'oncall') {
+            $query->oncall();
+        }
+
+        $timeLogs = $query->get();
+
+        $taskCount = TaskSchedule::query()
+            ->completed()
+            ->whereBetween('scheduled_date', [$startDate, $endDate])
+            ->when($this->selectedUserId, fn ($q) => $q->where('completed_by', $this->selectedUserId))
+            ->when($this->selectedStationId, fn ($q) => $q->whereHas('task', fn ($tq) => $tq->where('station_id', $this->selectedStationId)))
+            ->count();
+
+        $additionalTaskCount = CompletedAdditionalTask::query()
+            ->whereBetween('completed_date', [$startDate, $endDate])
+            ->when($this->selectedUserId, fn ($q) => $q->forUser($this->selectedUserId))
+            ->when($this->selectedStationId, fn ($q) => $q->forStation($this->selectedStationId))
+            ->count();
+
+        return [
+            'active_users' => $timeLogs->pluck('user_id')->unique()->count(),
+            'total_minutes' => $timeLogs->sum('total_minutes'),
+            'regular_minutes' => $timeLogs->where('is_oncall', false)->sum('total_minutes'),
+            'oncall_minutes' => $timeLogs->where('is_oncall', true)->sum('total_minutes'),
+            'tasks_completed' => $taskCount + $additionalTaskCount,
+            'stations_active' => $timeLogs->pluck('station_id')->unique()->count(),
+        ];
+    }
+
+    private function getUserTimeBreakdown(Carbon $startDate, Carbon $endDate): Collection
+    {
+        $query = TimeLog::query()
+            ->completed()
+            ->forDateRange($startDate->toDateString(), $endDate->toDateString())
+            ->with(['user', 'station']);
+
+        if ($this->selectedUserId) {
+            $query->forUser($this->selectedUserId);
+        }
+
+        if ($this->selectedStationId) {
+            $query->where('station_id', $this->selectedStationId);
+        }
+
+        if ($this->workType === 'regular') {
+            $query->regular();
+        } elseif ($this->workType === 'oncall') {
+            $query->oncall();
+        }
+
+        $timeLogs = $query->get()->groupBy('user_id');
+        $userIds = $timeLogs->keys();
+
+        // Eager load task counts for all users at once (prevents N+1)
+        $taskCounts = TaskSchedule::query()
+            ->completed()
+            ->whereBetween('scheduled_date', [$startDate, $endDate])
+            ->whereIn('completed_by', $userIds)
+            ->when($this->selectedStationId, fn ($q) => $q->whereHas('task', fn ($tq) => $tq->where('station_id', $this->selectedStationId)))
+            ->select('completed_by', DB::raw('count(*) as count'))
+            ->groupBy('completed_by')
+            ->pluck('count', 'completed_by');
+
+        $additionalCounts = CompletedAdditionalTask::query()
+            ->whereBetween('completed_date', [$startDate, $endDate])
+            ->whereIn('user_id', $userIds)
+            ->when($this->selectedStationId, fn ($q) => $q->forStation($this->selectedStationId))
+            ->select('user_id', DB::raw('count(*) as count'))
+            ->groupBy('user_id')
+            ->pluck('count', 'user_id');
+
+        return $timeLogs
+            ->map(function ($logs, $userId) use ($taskCounts, $additionalCounts) {
+                return [
+                    'user' => $logs->first()->user,
+                    'stations' => $logs->pluck('station.name')->unique()->filter(),
+                    'regular_minutes' => $logs->where('is_oncall', false)->sum('total_minutes'),
+                    'oncall_minutes' => $logs->where('is_oncall', true)->sum('total_minutes'),
+                    'total_minutes' => $logs->sum('total_minutes'),
+                    'tasks_completed' => ($taskCounts[$userId] ?? 0) + ($additionalCounts[$userId] ?? 0),
+                ];
+            })
+            ->sortByDesc('total_minutes')
+            ->values();
+    }
+
+    private function getTaskCompletions(Carbon $startDate, Carbon $endDate): LengthAwarePaginator
+    {
+        $query = TaskSchedule::query()
+            ->completed()
+            ->whereBetween('scheduled_date', [$startDate, $endDate])
+            ->with(['task.station', 'completedBy'])
+            ->orderBy('completed_at', 'desc');
+
+        if ($this->selectedUserId) {
+            $query->where('completed_by', $this->selectedUserId);
+        }
+
+        if ($this->selectedStationId) {
+            $query->whereHas('task', fn ($q) => $q->where('station_id', $this->selectedStationId));
+        }
+
+        return $query->paginate(15, ['*'], 'tasksPage');
+    }
+
+    private function getAdditionalTasks(Carbon $startDate, Carbon $endDate): LengthAwarePaginator
+    {
+        $query = CompletedAdditionalTask::query()
+            ->whereBetween('completed_date', [$startDate, $endDate])
+            ->with(['user', 'station'])
+            ->orderBy('completed_date', 'desc');
+
+        if ($this->selectedUserId) {
+            $query->forUser($this->selectedUserId);
+        }
+
+        if ($this->selectedStationId) {
+            $query->forStation($this->selectedStationId);
+        }
+
+        return $query->paginate(15, ['*'], 'additionalPage');
+    }
+}
