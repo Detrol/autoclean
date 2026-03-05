@@ -147,7 +147,7 @@
     @endif
 
     <!-- Time Log Edit/Create Modal -->
-    <flux:modal name="time-log-modal" :show="$showTimeLogModal" @close="closeTimeLogModal" class="max-w-lg">
+    <flux:modal wire:model.self="showTimeLogModal" @close="closeTimeLogModal" class="max-w-lg">
         <div class="space-y-6">
             <flux:heading size="lg">
                 {{ $isCreating ? 'Ny tidslogg' : 'Redigera tidslogg' }}
