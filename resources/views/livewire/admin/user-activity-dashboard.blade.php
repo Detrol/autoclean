@@ -179,14 +179,21 @@
                 <!-- Clock in / Clock out side by side -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <flux:input type="time" wire:model="formClockIn" label="Starttid" />
+                        <flux:input wire:model.live.debounce.500ms="formClockIn" label="Starttid" placeholder="HH:MM" maxlength="5" />
                         @error('formClockIn') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <flux:input type="time" wire:model="formClockOut" label="Sluttid" />
+                        <flux:input wire:model.live.debounce.500ms="formClockOut" label="Sluttid" placeholder="HH:MM" maxlength="5" />
                         @error('formClockOut') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
+
+                <!-- Duration (alternative to clock out) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <flux:input type="number" wire:model.live.debounce.500ms="formDurationHours" label="Timmar" min="0" max="23" placeholder="0" />
+                    <flux:input type="number" wire:model.live.debounce.500ms="formDurationMinutes" label="Minuter" min="0" max="59" placeholder="0" />
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-2">Ändra timmar/minuter för att uppdatera sluttid automatiskt, eller tvärtom.</p>
 
                 <!-- On-call switch -->
                 <flux:switch wire:model="formIsOncall" label="Jour" />

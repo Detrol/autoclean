@@ -50,6 +50,10 @@ class UserActivityDashboard extends Component
 
     public string $formClockOut = '';
 
+    public ?int $formDurationHours = null;
+
+    public ?int $formDurationMinutes = null;
+
     public bool $formIsOncall = false;
 
     public string $formNotes = '';
@@ -126,6 +130,59 @@ class UserActivityDashboard extends Component
         $this->resetPage();
     }
 
+    public function updatedFormClockIn(): void
+    {
+        $this->recalculateDurationFromTimes();
+    }
+
+    public function updatedFormClockOut(): void
+    {
+        $this->recalculateDurationFromTimes();
+    }
+
+    public function updatedFormDurationHours(): void
+    {
+        $this->recalculateClockOutFromDuration();
+    }
+
+    public function updatedFormDurationMinutes(): void
+    {
+        $this->recalculateClockOutFromDuration();
+    }
+
+    private function recalculateDurationFromTimes(): void
+    {
+        if (! preg_match('/^\d{2}:\d{2}$/', $this->formClockIn) || ! preg_match('/^\d{2}:\d{2}$/', $this->formClockOut)) {
+            return;
+        }
+
+        $clockIn = Carbon::createFromFormat('H:i', $this->formClockIn);
+        $clockOut = Carbon::createFromFormat('H:i', $this->formClockOut);
+
+        if ($clockOut->greaterThan($clockIn)) {
+            $totalMinutes = $clockIn->diffInMinutes($clockOut);
+            $this->formDurationHours = intdiv($totalMinutes, 60);
+            $this->formDurationMinutes = $totalMinutes % 60;
+        } else {
+            $this->formDurationHours = 0;
+            $this->formDurationMinutes = 0;
+        }
+    }
+
+    private function recalculateClockOutFromDuration(): void
+    {
+        if (! preg_match('/^\d{2}:\d{2}$/', $this->formClockIn)) {
+            return;
+        }
+
+        $hours = max(0, (int) ($this->formDurationHours ?? 0));
+        $minutes = max(0, (int) ($this->formDurationMinutes ?? 0));
+
+        $clockIn = Carbon::createFromFormat('H:i', $this->formClockIn);
+        $clockOut = $clockIn->copy()->addHours($hours)->addMinutes($minutes);
+        $this->formClockOut = $clockOut->format('H:i');
+    }
+
     public function editTimeLog(int $timeLogId): void
     {
         $timeLog = TimeLog::findOrFail($timeLogId);
@@ -138,6 +195,7 @@ class UserActivityDashboard extends Component
         $this->formClockOut = $timeLog->clock_out?->format('H:i') ?? '';
         $this->formIsOncall = $timeLog->is_oncall;
         $this->formNotes = $timeLog->notes ?? '';
+        $this->recalculateDurationFromTimes();
         $this->isCreating = false;
         $this->showTimeLogModal = true;
     }
@@ -224,6 +282,8 @@ class UserActivityDashboard extends Component
         $this->formDate = '';
         $this->formClockIn = '';
         $this->formClockOut = '';
+        $this->formDurationHours = null;
+        $this->formDurationMinutes = null;
         $this->formIsOncall = false;
         $this->formNotes = '';
     }
