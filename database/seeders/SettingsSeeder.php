@@ -29,6 +29,22 @@ class SettingsSeeder extends Seeder
                 'label' => 'Kräv Inklockning för Admins',
                 'description' => 'Kräv att administratörer är inklockade på en station för att slutföra uppgifter. Om inaktiverat kan admins alltid slutföra uppgifter.',
             ],
+            [
+                'key' => 'auto_clock_out_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'timekeeping',
+                'label' => 'Aktivera automatisk utklocking',
+                'description' => 'Klocka automatiskt ut användare som glömt att klocka ut.',
+            ],
+            [
+                'key' => 'auto_clock_out_hours',
+                'value' => '12',
+                'type' => 'integer',
+                'group' => 'timekeeping',
+                'label' => 'Max timmar innan automatisk utklocking',
+                'description' => 'Antal timmar efter inklockning innan systemet automatiskt klockar ut.',
+            ],
         ];
 
         foreach ($settings as $setting) {

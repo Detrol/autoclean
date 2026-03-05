@@ -159,14 +159,12 @@ class UserActivityDashboard extends Component
         $clockIn = Carbon::createFromFormat('H:i', $this->formClockIn);
         $clockOut = Carbon::createFromFormat('H:i', $this->formClockOut);
 
-        if ($clockOut->greaterThan($clockIn)) {
-            $totalMinutes = $clockIn->diffInMinutes($clockOut);
-            $this->formDurationHours = intdiv($totalMinutes, 60);
-            $this->formDurationMinutes = $totalMinutes % 60;
-        } else {
-            $this->formDurationHours = 0;
-            $this->formDurationMinutes = 0;
+        if ($clockOut->lessThanOrEqualTo($clockIn)) {
+            $clockOut->addDay();
         }
+        $totalMinutes = $clockIn->diffInMinutes($clockOut);
+        $this->formDurationHours = intdiv($totalMinutes, 60);
+        $this->formDurationMinutes = $totalMinutes % 60;
     }
 
     private function recalculateClockOutFromDuration(): void
@@ -237,9 +235,10 @@ class UserActivityDashboard extends Component
 
         $clockIn = Carbon::parse($this->formDate.' '.$this->formClockIn);
         $clockOut = Carbon::parse($this->formDate.' '.$this->formClockOut);
-        $totalMinutes = $clockOut->greaterThan($clockIn)
-            ? $clockIn->diffInMinutes($clockOut)
-            : 0;
+        if ($clockOut->lessThanOrEqualTo($clockIn)) {
+            $clockOut->addDay();
+        }
+        $totalMinutes = $clockIn->diffInMinutes($clockOut);
 
         $data = [
             'user_id' => $this->formUserId,
@@ -290,6 +289,13 @@ class UserActivityDashboard extends Component
         $this->formNotes = '';
     }
 
+    public function adminClockOut(int $timeLogId): void
+    {
+        $timeLog = TimeLog::findOrFail($timeLogId);
+        $timeLog->clockOut('Utklockad av admin');
+        session()->flash('success', 'Användaren har klockats ut.');
+    }
+
     public function render(): View
     {
         [$startDate, $endDate] = $this->computePeriodBoundaries();
@@ -300,6 +306,7 @@ class UserActivityDashboard extends Component
             'periodLabel' => $this->getPeriodLabel($startDate),
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'activeTimeLogs' => $this->getActiveTimeLogs(),
             'timeLogs' => $this->getTimeLogs($startDate, $endDate),
             'timeStats' => $this->getTimeStats($startDate, $endDate),
             'userTimeBreakdown' => $this->getUserTimeBreakdown($startDate, $endDate),
@@ -318,6 +325,17 @@ class UserActivityDashboard extends Component
             'station_id' => $this->selectedStationId,
             'work_type' => $this->workType,
         ]);
+    }
+
+    private function getActiveTimeLogs(): Collection
+    {
+        return TimeLog::query()
+            ->active()
+            ->with(['user', 'station'])
+            ->when($this->selectedUserId, fn ($q) => $q->forUser($this->selectedUserId))
+            ->when($this->selectedStationId, fn ($q) => $q->where('station_id', $this->selectedStationId))
+            ->orderBy('clock_in', 'asc')
+            ->get();
     }
 
     private function computePeriodBoundaries(): array

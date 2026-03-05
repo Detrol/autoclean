@@ -14,3 +14,6 @@ app(Schedule::class)->command('tasks:rollover-overdue')->dailyAt('00:00');
 
 // Then generate new tasks (5 minutes later to avoid race conditions)
 app(Schedule::class)->command('tasks:generate --date=tomorrow')->dailyAt('00:05')->withoutOverlapping();
+
+// Auto clock-out users who forgot to clock out
+app(Schedule::class)->command('timelogs:auto-clock-out')->hourly();

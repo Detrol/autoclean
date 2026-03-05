@@ -130,6 +130,38 @@
         </flux:button.group>
     </div>
 
+    <!-- Active Time Logs -->
+    @if($activeTimeLogs->isNotEmpty())
+        <div class="mb-6 rounded-lg border border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950 p-4">
+            <h3 class="text-base font-semibold text-amber-800 dark:text-amber-200 mb-3">
+                Aktiva pass ({{ $activeTimeLogs->count() }})
+            </h3>
+            <div class="space-y-2">
+                @foreach($activeTimeLogs as $activeLog)
+                    <div wire:key="active-log-{{ $activeLog->id }}" class="flex items-center justify-between rounded-md bg-white dark:bg-gray-800 p-3 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <flux:avatar size="sm" name="{{ $activeLog->user->name }}" />
+                            <div>
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $activeLog->user->name }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">{{ $activeLog->station->name ?? '—' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-600 dark:text-gray-300">
+                                Inklockad sedan {{ $activeLog->clock_in->format('H:i') }}
+                                ({{ $activeLog->clock_in->diffForHumans(null, true) }})
+                            </span>
+                            <flux:button wire:click="editTimeLog({{ $activeLog->id }})" variant="ghost" size="sm" icon="pencil-square" title="Redigera" />
+                            <flux:button wire:click="adminClockOut({{ $activeLog->id }})" wire:confirm="Är du säker på att du vill klocka ut denna användare?" variant="filled" size="sm">
+                                Klocka ut
+                            </flux:button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <!-- Statistics Cards -->
     @include('livewire.admin.partials.user-activity-stats', ['stats' => $timeStats])
 
@@ -194,6 +226,12 @@
                     <flux:input type="number" wire:model.live.debounce.500ms="formDurationMinutes" label="Minuter" min="0" max="59" placeholder="0" />
                 </div>
                 <p class="text-xs text-gray-500 dark:text-gray-400 -mt-2">Ändra timmar/minuter för att uppdatera sluttid automatiskt, eller tvärtom.</p>
+
+                @if($formClockIn && $formClockOut && $formClockOut < $formClockIn)
+                    <p class="text-xs text-amber-600 dark:text-amber-400">
+                        Passet passerar midnatt — sluttid tolkas som nästa dag.
+                    </p>
+                @endif
 
                 <!-- On-call switch -->
                 <flux:switch wire:model="formIsOncall" label="Jour" />
