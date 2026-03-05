@@ -32,6 +32,28 @@ class UserActivityDashboard extends Component
 
     public string $activeTab = 'time';
 
+    // Modal state
+    public bool $showTimeLogModal = false;
+
+    public bool $isCreating = false;
+
+    public ?int $editingTimeLogId = null;
+
+    // Form fields
+    public ?int $formUserId = null;
+
+    public ?int $formStationId = null;
+
+    public string $formDate = '';
+
+    public string $formClockIn = '';
+
+    public string $formClockOut = '';
+
+    public bool $formIsOncall = false;
+
+    public string $formNotes = '';
+
     protected $queryString = [
         'periodType' => ['except' => 'day'],
         'selectedDate' => ['except' => ''],
@@ -102,6 +124,108 @@ class UserActivityDashboard extends Component
     public function updatedWorkType(): void
     {
         $this->resetPage();
+    }
+
+    public function editTimeLog(int $timeLogId): void
+    {
+        $timeLog = TimeLog::findOrFail($timeLogId);
+
+        $this->editingTimeLogId = $timeLog->id;
+        $this->formUserId = $timeLog->user_id;
+        $this->formStationId = $timeLog->station_id;
+        $this->formDate = $timeLog->date->format('Y-m-d');
+        $this->formClockIn = $timeLog->clock_in->format('H:i');
+        $this->formClockOut = $timeLog->clock_out?->format('H:i') ?? '';
+        $this->formIsOncall = $timeLog->is_oncall;
+        $this->formNotes = $timeLog->notes ?? '';
+        $this->isCreating = false;
+        $this->showTimeLogModal = true;
+    }
+
+    public function createTimeLog(): void
+    {
+        $this->resetTimeLogForm();
+        $this->formDate = $this->selectedDate;
+        $this->formUserId = $this->selectedUserId;
+        $this->isCreating = true;
+        $this->showTimeLogModal = true;
+    }
+
+    public function saveTimeLog(): void
+    {
+        $this->validate([
+            'formUserId' => 'required|exists:users,id',
+            'formStationId' => 'required|exists:stations,id',
+            'formDate' => 'required|date',
+            'formClockIn' => 'required|date_format:H:i',
+            'formClockOut' => 'required|date_format:H:i',
+            'formIsOncall' => 'boolean',
+            'formNotes' => 'nullable|string|max:500',
+        ], [
+            'formUserId.required' => 'Användare krävs.',
+            'formUserId.exists' => 'Ogiltig användare.',
+            'formStationId.required' => 'Station krävs.',
+            'formStationId.exists' => 'Ogiltig station.',
+            'formDate.required' => 'Datum krävs.',
+            'formDate.date' => 'Ogiltigt datum.',
+            'formClockIn.required' => 'Starttid krävs.',
+            'formClockIn.date_format' => 'Starttid måste vara i formatet HH:MM.',
+            'formClockOut.required' => 'Sluttid krävs.',
+            'formClockOut.date_format' => 'Sluttid måste vara i formatet HH:MM.',
+            'formNotes.max' => 'Anteckningar får vara max 500 tecken.',
+        ]);
+
+        $clockIn = Carbon::parse($this->formDate.' '.$this->formClockIn);
+        $clockOut = Carbon::parse($this->formDate.' '.$this->formClockOut);
+        $totalMinutes = $clockOut->greaterThan($clockIn)
+            ? $clockIn->diffInMinutes($clockOut)
+            : 0;
+
+        $data = [
+            'user_id' => $this->formUserId,
+            'station_id' => $this->formStationId,
+            'date' => $this->formDate,
+            'clock_in' => $clockIn,
+            'clock_out' => $clockOut,
+            'total_minutes' => $totalMinutes,
+            'is_oncall' => $this->formIsOncall,
+            'notes' => $this->formNotes ?: null,
+        ];
+
+        if ($this->isCreating) {
+            TimeLog::create($data);
+            session()->flash('success', 'Tidslogg skapad.');
+        } else {
+            TimeLog::findOrFail($this->editingTimeLogId)->update($data);
+            session()->flash('success', 'Tidslogg uppdaterad.');
+        }
+
+        $this->closeTimeLogModal();
+    }
+
+    public function deleteTimeLog(): void
+    {
+        TimeLog::findOrFail($this->editingTimeLogId)->delete();
+        session()->flash('success', 'Tidslogg borttagen.');
+        $this->closeTimeLogModal();
+    }
+
+    public function closeTimeLogModal(): void
+    {
+        $this->resetTimeLogForm();
+        $this->showTimeLogModal = false;
+    }
+
+    private function resetTimeLogForm(): void
+    {
+        $this->editingTimeLogId = null;
+        $this->formUserId = null;
+        $this->formStationId = null;
+        $this->formDate = '';
+        $this->formClockIn = '';
+        $this->formClockOut = '';
+        $this->formIsOncall = false;
+        $this->formNotes = '';
     }
 
     public function render(): View

@@ -41,6 +41,13 @@
         </div>
     </div>
 
+    <!-- Flash messages -->
+    @if (session()->has('success'))
+        <flux:callout variant="success" class="mb-4" icon="check-circle">
+            {{ session('success') }}
+        </flux:callout>
+    @endif
+
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -138,4 +145,75 @@
             'additionalTasks' => $additionalTasks
         ])
     @endif
+
+    <!-- Time Log Edit/Create Modal -->
+    <flux:modal name="time-log-modal" :show="$showTimeLogModal" @close="closeTimeLogModal" class="max-w-lg">
+        <div class="space-y-6">
+            <flux:heading size="lg">
+                {{ $isCreating ? 'Ny tidslogg' : 'Redigera tidslogg' }}
+            </flux:heading>
+
+            <div class="space-y-4">
+                <!-- User -->
+                <flux:select wire:model="formUserId" label="Användare" :disabled="!$isCreating">
+                    <option value="">Välj användare...</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </flux:select>
+                @error('formUserId') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+
+                <!-- Station -->
+                <flux:select wire:model="formStationId" label="Station">
+                    <option value="">Välj station...</option>
+                    @foreach($stations as $station)
+                        <option value="{{ $station->id }}">{{ $station->name }}</option>
+                    @endforeach
+                </flux:select>
+                @error('formStationId') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+
+                <!-- Date -->
+                <flux:input type="date" wire:model="formDate" label="Datum" />
+                @error('formDate') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+
+                <!-- Clock in / Clock out side by side -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <flux:input type="time" wire:model="formClockIn" label="Starttid" />
+                        @error('formClockIn') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <flux:input type="time" wire:model="formClockOut" label="Sluttid" />
+                        @error('formClockOut') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <!-- On-call switch -->
+                <flux:switch wire:model="formIsOncall" label="Jour" />
+
+                <!-- Notes -->
+                <flux:textarea wire:model="formNotes" label="Anteckningar" rows="2" placeholder="Valfria anteckningar..." />
+                @error('formNotes') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-2">
+                <div>
+                    @if(!$isCreating)
+                        <flux:button wire:click="deleteTimeLog" wire:confirm="Är du säker på att du vill ta bort denna tidslogg?" variant="danger" size="sm">
+                            Ta bort
+                        </flux:button>
+                    @endif
+                </div>
+                <div class="flex gap-2">
+                    <flux:button wire:click="closeTimeLogModal" variant="ghost">
+                        Avbryt
+                    </flux:button>
+                    <flux:button wire:click="saveTimeLog" variant="primary">
+                        {{ $isCreating ? 'Skapa' : 'Spara' }}
+                    </flux:button>
+                </div>
+            </div>
+        </div>
+    </flux:modal>
 </div>

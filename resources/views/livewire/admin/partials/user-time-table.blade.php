@@ -79,10 +79,13 @@
 
 <!-- Detailed Time Logs Table -->
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-    <div class="px-4 py-3 border-b dark:border-gray-700">
+    <div class="px-4 py-3 border-b dark:border-gray-700 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             Detaljerade tidsloggar
         </h3>
+        <flux:button wire:click="createTimeLog" variant="primary" size="sm" icon="plus">
+            Ny tidslogg
+        </flux:button>
     </div>
 
     @if($timeLogs->isEmpty())
@@ -118,6 +121,9 @@
                         <th class="text-right py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">
                             Tid
                         </th>
+                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">
+                            Åtgärder
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y dark:divide-gray-700">
@@ -147,6 +153,9 @@
                         </td>
                         <td class="py-3 px-4 text-sm text-right font-medium text-gray-900 dark:text-white">
                             {{ app(\App\Support\TimeFormatter::class)->formatMinutesSv($log->total_minutes ?? 0) }}
+                        </td>
+                        <td class="py-3 px-4 text-sm text-right">
+                            <flux:button wire:click="editTimeLog({{ $log->id }})" variant="ghost" size="xs" icon="pencil" />
                         </td>
                     </tr>
                     @endforeach
