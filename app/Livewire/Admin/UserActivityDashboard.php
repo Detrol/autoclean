@@ -195,7 +195,9 @@ class UserActivityDashboard extends Component
         $this->formClockOut = $timeLog->clock_out?->format('H:i') ?? '';
         $this->formIsOncall = $timeLog->is_oncall;
         $this->formNotes = $timeLog->notes ?? '';
-        $this->recalculateDurationFromTimes();
+        $totalMinutes = $timeLog->total_minutes ?? 0;
+        $this->formDurationHours = intdiv($totalMinutes, 60);
+        $this->formDurationMinutes = $totalMinutes % 60;
         $this->isCreating = false;
         $this->showTimeLogModal = true;
     }
